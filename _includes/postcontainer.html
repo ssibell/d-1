@@ -1,0 +1,135 @@
+<div id="dcacheContent">
+
+        <div id="dcacheFrontContainer">
+          <div id="dcacheFrontMain">
+            <div id="dcacheFrontFeature">
+              <div id="dcacheFrontFeatureContent">
+<p id="date"></p>
+<script>
+document.getElementById("date").innerHTML = Date();
+</script>
+              
+                <h1 id="txtFrontFeatureHeading">
+                 {{ post.title }}
+                </h1>
+  
+  {{ content }}
+                </div>
+
+              </div>
+            </div> <!-- dcacheFrontFeature -->
+           
+          </div> <!-- dcacheFrontMain -->
+        </div> <!-- dcacheFrontContainer -->
+        <div id="dcacheFrontRightContainer">
+          <div id="dcacheFrontLatestReleases">
+            <h3 class="txtHomeHeader">&gt;&nbsp; Latest Releases</h3>
+            <div id="dcacheFrontLatestReleasesWrap">
+              
+
+
+{% for post in site.categories.releases limit:5 %}
+                 <h4><li><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </li></h4>
+                  <span> &nbsp;&nbsp;&nbsp; {{ post.date | date: "%b %-d, %Y" }}</span>
+                   
+                  
+                 
+                {% endfor %}
+
+      
+            </div>
+	    <div id="dcacheFrontLatestReleasesNote"><b>Find Us On: </b> | <a href="https://plus.google.com/+DcacheOrg">Google</a> <br />
+<li> Documentation : <a href="https://www.dcache.org/manuals/index.shtml"> Publications, Presentations and more</a></li>
+<li>dCache, <a href="https://www.dcache.org/manuals/book.shtml">the Book</a></li>
+<li>More on <a href="https://www.dcache.org/mailinglists.shtml">mailing lists</a></li>
+<li><a href="http://trac.dcache.org/">The dCache wiki</a> </li>
+</div>
+          </div> <!-- dcacheFrontLatestreleases -->
+          <div id="dcacheFrontShortcuts">
+            <h3 class="txtHomeHeader">&gt;&nbsp; PROJECT PARTNERS</h3>
+            <div id="dcacheFrontShortcutsWrap">
+              <ul id="dcacheFrontShortcutsList">
+                <li>
+                  <a href="https://neic.no/nt1/">NDGF</a>
+                </li>
+                <li>
+                  <a href="http://www.fnal.gov/"> Fermi National Accelerator Laboratory</a>
+                </li>
+                <li>
+                  <a href="http://www.desy.de/">Deutsches Elektronen-Synchrotron, DESY</a>
+                </li>
+                
+              </ul>
+            </div>
+          </div> <!-- dcacheFrontShortcuts -->
+          <div id="dcacheFrontSupportUs">
+            <h3 class="txtHomeHeader">&gt;&nbsp; INFO - CONTACT</h3>
+            <div id="dcacheFrontSupportUsWrap">
+ support@dcache.org
+</br> security@dcache.org
+
+            </div>
+          </div> <!-- dcacheFrontSupportUs -->
+        </div> <!-- dcacheFrontRightContainer -->
+        <div id="dcacheFrontBottomContainer">
+         <div id="dcacheFrontNews" class="txtNewsEvent">
+           <h3 class="txtHomeHeader">
+             &gt;&nbsp;
+             <a href="/about/newsarchive">News</a>
+           </h3>
+           <div class="dcacheNewsEventsWrap">
+             
+{% for post in site.categories.news limit:20 %}
+ <span class="txtDate">{{ post.date | date: "%b %-d, %Y" }}</span>
+                 <h3><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </h3>
+                                      {{ post.excerpt }}
+                    <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+                 
+                {% endfor %}
+
+
+           </div>
+         </div> <!-- dcacheFrontNews -->
+         <div id="dcacheFrontPlanet">
+           <h3 class="txtHomeHeader">
+             &gt;&nbsp;
+             <a href="https://planet.dcache.org">dCache blogs</a>
+           </h3>
+           <div id="dcacheFrontPlanetWrap">
+            
+            
+{% for post in site.categories.posts limit:20 %}
+ <span class="txtDate">{{ post.date | date: "%b %-d, %Y" }}</span>
+                 <h3><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </h3>
+                                      {{ post.excerpt }}
+                    <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+                 
+                {% endfor %}
+
+
+          
+           </div> <!-- dcacheFrontPlanetWrap -->
+         </div> <!-- dcacheFrontPlanet -->
+         <div id="dcacheFrontEvents" class="txtNewsEvent">
+           
+             <h3 class="txtHomeHeader">
+               &gt;&nbsp;
+               <a href="/about/events/">Events</a>
+             </h3>
+             <div class="dcacheNewsEventsWrap">
+             
+              
+{% for post in site.categories.events limit:20 %}
+ <span class="txtDate">{{ post.date | date: "%b %-d, %Y" }}</span>
+                 <h3><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </h3>
+                                      {{ post.excerpt }}
+                    <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+                 
+                {% endfor %}
+
+
+           </div> <!-- dcacheNewsEventsWrap -->
+         </div> <!-- dcacheFrontEvent -->
+        </div> <!-- dcacheFrontBottomContainer -->
+
+     <br class="dcacheClearBoth" />

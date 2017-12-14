@@ -1,0 +1,170 @@
+<div id="dcacheContent">
+
+        <div id="dcacheFrontContainer">
+          <div id="dcacheFrontMain">
+            <div id="dcacheFrontFeature">
+              <div id="dcacheFrontFeatureContent">
+<p id="date"></p>
+<script>
+document.getElementById("date").innerHTML = Date();
+</script>
+              
+                <h1 id="txtFrontFeatureHeading">
+                  dCache 4.0 Released!
+                </h1>
+                <p>
+                 <h2>dCache 4.0 features the following highlights and architectural improvements:</h2>
+
+<li> dCache-StAR now supports PostgreSQL servers on non-standard ports.</li>
+<li> dCache now supports RFC 3230-style Want-Digest headers. These allow clients to request specific checksumming algorithms.</li>
+<li> gPlazma may be configured so that plugins cooperate in building a list of gids for an authenticated user.</li>
+<li> Pools can now be configured to calculate several checksums for any uploaded file at once.</li>
+</br>
+dCache v4.0 requires a JVM supporting Java 8.
+                </p>
+                <p>
+                  In preparation of upcoming changes, dCache 4.0 contains many small architectural improvements, bug fixes and structural changes that will be needed for new features that will be incorporated into later releases. Apart from greater stability and improved error handling in many circumstances, there are few user-visible changes in this release.
+</br>
+For systems where local users also tend to be members of VOs, dCache 4.0 brings a helpful change in the way group membership is assigned. gPlazma can now be configured so that several authentication plugins cooperate in selecting and setting the primary GID of a user account, so that a user can work in a mixed environment where he or she is recognized through both a local account and a VOMS identity.</br>
+
+In order to facilitate moving clients to using different checksums, the pools can now be configured to calculate several checksums for any uploaded file at once. A file may thus get both an ADLER32 and an MD5 checksum, for example.
+                </p>
+
+                <div id="txtFrontFeatureLink">
+                  <br/>
+                  <img src="../images/blt_blu_arrow.png" width="6" height="6" alt="" /><a href="/about/news/1801/" title="Release Announcement">Release Announcement</a><br />
+                  <img src="../images/blt_blu_arrow.png" width="6" height="6" alt="" /><a href="/docs/10/static/release-10-1.html" title="Release Notes">Release Notes</a><br />
+                  <img src="../images/blt_blu_arrow.png" width="6" height="6" alt="" /><a href="/download/" title="Download">Download</a>
+                </div>
+
+              </div>
+            </div> <!-- dcacheFrontFeature -->
+            <div id="dcacheFrontUSSContainer">
+              <div id="dcacheFrontUser">
+                <div id="dcacheFrontUserInner">
+                  <div id="dcacheFrontUserWrap">
+                    <h3 class="txtHomeHeader">&gt;&nbsp; SCOPE OF THE PROJECT</h3>
+                    <div id="dcacheFrontUserContent">
+                      <div id="txtFrontUserText">The goal of this project is to provide a system for storing and retrieving huge amounts of data, distributed among a large number of heterogenous server nodes, under a single virtual filesystem tree with a variety of standard access methods. </div>
+                     
+                      <div id="txtFrontUserLink">
+                          
+                      </div>
+                    </div>
+                  </div> <!-- dcacheFrontUserWrap -->
+                </div>
+              </div>
+            </div> <!-- dcacheFrontUSSContainer -->
+          </div> <!-- dcacheFrontMain -->
+        </div> <!-- dcacheFrontContainer -->
+        <div id="dcacheFrontRightContainer">
+          <div id="dcacheFrontLatestReleases">
+            <h3 class="txtHomeHeader">&gt;&nbsp; Latest Releases</h3>
+            <div id="dcacheFrontLatestReleasesWrap">
+              
+
+{% for post in site.categories.releases limit:5 %}
+                 <h4><li><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </li></h4>
+                  <span> &nbsp;&nbsp;&nbsp; {{ post.date | date: "%b %-d, %Y" }}</span>
+                   
+                  
+                 
+                {% endfor %}
+
+      
+            </div>
+	    <div id="dcacheFrontLatestReleasesNote"><b>Find Us On: </b> | <a href="https://plus.google.com/+DcacheOrg">Google</a> <br />
+<li> Documentation : <a href="https://www.dcache.org/manuals/index.shtml"> Publications, Presentations and more</a></li>
+<li>dCache, <a href="https://www.dcache.org/manuals/book.shtml">the Book</a></li>
+<li>More on <a href="https://www.dcache.org/mailinglists.shtml">mailing lists</a></li>
+<li><a href="http://trac.dcache.org/">The dCache wiki</a> </li>
+</div>
+          </div> <!-- dcacheFrontLatestreleases -->
+          <div id="dcacheFrontShortcuts">
+            <h3 class="txtHomeHeader">&gt;&nbsp; PROJECT PARTNERS</h3>
+            <div id="dcacheFrontShortcutsWrap">
+              <ul id="dcacheFrontShortcutsList">
+                <li>
+                  <a href="https://neic.no/nt1/">NDGF</a>
+                </li>
+                <li>
+                  <a href="http://www.fnal.gov/"> Fermi National Accelerator Laboratory</a>
+                </li>
+                <li>
+                  <a href="http://www.desy.de/">Deutsches Elektronen-Synchrotron, DESY</a>
+                </li>
+                
+              </ul>
+            </div>
+          </div> <!-- dcacheFrontShortcuts -->
+          <div id="dcacheFrontSupportUs">
+            <h3 class="txtHomeHeader">&gt;&nbsp; INFO - CONTACT</h3>
+            <div id="dcacheFrontSupportUsWrap">
+ support@dcache.org
+</br> security@dcache.org
+
+            </div>
+          </div> <!-- dcacheFrontSupportUs -->
+        </div> <!-- dcacheFrontRightContainer -->
+        <div id="dcacheFrontBottomContainer">
+         <div id="dcacheFrontNews" class="txtNewsEvent">
+           <h3 class="txtHomeHeader">
+             &gt;&nbsp;
+             <a href="/about/newsarchive">News</a>
+           </h3>
+           <div class="dcacheNewsEventsWrap">
+             
+{% for post in site.categories.news limit:20 %}
+ <span class="txtDate">{{ post.date | date: "%b %-d, %Y" }}</span>
+                 <h3><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </h3>
+                                      {{ post.excerpt }}
+                    <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+                 
+                {% endfor %}
+
+
+           </div>
+         </div> <!-- dcacheFrontNews -->
+         <div id="dcacheFrontPlanet">
+           <h3 class="txtHomeHeader">
+             &gt;&nbsp;
+             <a href="https://planet.dcache.org">dCache blogs</a>
+           </h3>
+           <div id="dcacheFrontPlanetWrap">
+            
+            
+{% for post in site.categories.posts limit:20 %}
+ <span class="txtDate">{{ post.date | date: "%b %-d, %Y" }}</span>
+                 <h3><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </h3>
+                                      {{ post.excerpt }}
+                    <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+                 
+                {% endfor %}
+
+
+          
+           </div> <!-- dcacheFrontPlanetWrap -->
+         </div> <!-- dcacheFrontPlanet -->
+         <div id="dcacheFrontEvents" class="txtNewsEvent">
+           
+             <h3 class="txtHomeHeader">
+               &gt;&nbsp;
+               <a href="/about/events/">Events</a>
+             </h3>
+             <div class="dcacheNewsEventsWrap">
+             
+              
+{% for post in site.categories.events limit:20 %}
+ <span class="txtDate">{{ post.date | date: "%b %-d, %Y" }}</span>
+                 <h3><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> </h3>
+                                      {{ post.excerpt }}
+                    <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+                 
+                {% endfor %}
+
+
+           </div> <!-- dcacheNewsEventsWrap -->
+         </div> <!-- dcacheFrontEvent -->
+        </div> <!-- dcacheFrontBottomContainer -->
+
+     <br class="dcacheClearBoth" />
