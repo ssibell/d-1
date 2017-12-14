@@ -1,0 +1,2667 @@
+---
+layout: default
+---
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>dCache 1.9.5 to 1.9.12 upgrade guide</title>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<!--script type="text/javascript" src="jquery.tablesorter.min.js"></script-->
+<script type="text/javascript" src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.1.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function()
+    {
+        $('#toc').toc({autoId: true, exclude: 'h1,#TOC'});
+//        $('table.sortable').tablesorter();
+    }
+);
+</script>
+
+<style type="text/css">
+/* Dimensions */
+body { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+/* Coloring */
+
+h1,h2 { color: #0c3764 }
+h3,h4,h5 { color: #444 }
+
+/* Fonts */
+
+dt { font-style: italic }
+
+/* Columns */
+
+.two-columns {
+  -moz-column-count:2;
+  -moz-column-rule: dotted grey 1pt;
+  -webkit-column-count: 2;
+  -webkit-column-rule: dotted grey 1pt;
+  column-count: 2;
+  column-rule: dotted grey 1pt;
+}
+
+/* TOC */
+div#toc ul {
+    list-style: none;
+}
+div#toc ul li ul {
+    margin-bottom: 0.75em;
+}
+div#toc ul li ul li ul {
+    margin-bottom: 0.25em;
+}
+
+/* tablesorter */
+table.sortable thead tr .header {
+	background-image: url('data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==');
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+table.sortable tbody tr.odd td {
+	background-color:#F0F0F6;
+}
+table.sortable thead tr .headerSortUp {
+	background-image: url('data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7');
+}
+table.sortable thead tr .headerSortDown {
+	background-image: url('data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7');
+}
+table.sortable thead tr .headerSortDown, table.sortable thead tr .headerSortUp {
+        background-color: #8dbdd8;
+}
+
+/*
+Tema: Soft Table - A Simple table style with the use of the soft brown color
+Author: Newton de Góes Horta
+Site: --
+Country Origin: Brazil
+*/
+table {
+ font-size:0.9em;
+ font-family: Arial, Helvetica, verdana sans-serif;
+ background-color:#fff;
+ border-collapse: collapse;
+ width: 100%;
+}
+caption {
+ font-size: 1.2em;
+ color: #444;
+ font-weight: bold;
+ text-align: left;
+ background: url(header_bg.jpg) no-repeat top left;
+ padding: 10px;
+ margin-bottom: 2px;
+}
+thead th {
+ border-right: 1px solid #fff;
+ color:#fff;
+ text-align: left;
+ padding: 2px 2px 2px 5px;
+ text-transform:uppercase;
+ height:25px;
+ background-color: #82b4c8;
+ font-weight: normal;
+}
+tfoot {
+ color:#1ba6b2;
+ padding:2px;
+ text-transform:uppercase;
+ font-size:1.2em;
+ font-weigth: bold;
+ margin-top:6px;
+ border-top: 6px solid #e9f7f6;
+}
+tbody tr {
+ background-color:#fff;
+ border-bottom: 1px solid #f0f0f0;
+}
+tbody td {
+ color:#414141;
+ padding:5px;
+ text-align:left;
+ vertical-align: top;
+}
+tbody th {
+ text-align:left;
+ padding:2px;
+}
+tbody td a, tbody th a {
+ color:#6C8C37;
+ text-decoration:none;
+ font-weight:normal;
+ display:block;
+ background: transparent no-repeat 0% 50%;
+ padding-left:15px;
+}
+tbody td a:hover, tbody th a:hover {
+ color:#009193;
+ text-decoration:none;
+}
+</style>
+
+<style type="text/css" media="print">
+a:link, a:visited {
+  color: #520;
+  background: transparent;
+  font-weight: bold;
+  text-decoration: underline;
+}
+a:link:after, a:visited:after {
+  content: " (" attr(href) ") ";
+  font-size: 90%;
+}
+h1,h2,h3,h4 {
+  page-break-after: avoid;
+}
+</style>
+</head>
+<body>
+
+
+<h1 style="margin-bottom: 0">The Ultimate Golden Release Upgrade Guide</h1>
+<p style="margin-top: 0; color: #0c3764; font-size: 130%; font-weight: bold; font-style: italic">How to get from 1.9.5 to 1.9.12</p>
+<p><em>By Gerd Behrmann &lt;behrmann@ndgf.org&gt;</em></p>
+
+<h2 id="TOC">Table of contents</h2>
+
+<div id="toc" class="two-columns"></div>
+
+<h2>Introduction</h2>
+
+<p>dCache 1.9.12 is the second long term support release (aka
+<em>golden release</em>). It is the result of 18 months of development
+since the release of dCache 1.9.5, the previous long term support
+release. During these 18 months 7 feature releases (1.9.6 to 1.9.12)
+were made at regular intervals. This document compiles the most
+important information from these seven feature releases.</p>
+
+<p>dCache 1.9.12 will be supported with regular bug fix releases at
+least until primo 2013. dCache 1.9.5 will be supported until primo
+2012, however one should expect the release frequency to drop of as
+only the most critical bugs and security issues will be fixed. While
+the upgrade path from 1.9.5 to 1.9.12 is relatively easy, it should be
+expected that no direct upgrade path from releases prior to 1.9.12 to
+a future (third) long term support release is provided.</p>
+
+<p>Many things have changed between 1.9.5 and 1.9.12 and this document
+does not attempt to describe every little change. The focus is on
+changes that affect the upgrade process and on new features. Minor
+feature changes and bug fixes are often exluded. There is more
+information scattered in the release notes of each individual
+release.</p>
+
+<p>The last section of this document contains useful reference
+material that should be consulted while reading this document. The
+reference material also includes a proposed checklist that may be used
+while planning an upgrade to 1.9.12.</p>
+
+<h2>The filesystem hierarchy standard</h2>
+
+<p>The filesystem hierarchy standard (FHS) provides a set of requirements
+and guidelines for file and directory placement under UNIX-like
+operating systems.</p>
+
+<p>dCache has traditionally been installed in
+<tt>/opt/d-cache</tt>. Although this directory is specified by the
+FHS, dCache did not follow the recommendations for the installation in
+<tt>/opt</tt>.</p>
+
+<p>As part of the European Middleware Initiative (EMI) release 1
+dCache is now provided in two different layouts:</p>
+
+<ul>
+<li>the classic layout in <tt>/opt</tt>;</li>
+<li>a FHS compliant layout.</li>
+</ul>
+
+<p>The FHS compliant layout installs the bulk of the static files in
+<tt>/usr/share/dcache</tt>, with a few files in <tt>/usr/bin</tt>,
+<tt>/usr/sbin</tt> and <tt>/usr/share/man</tt>. Configuration files
+are stored under <tt>/etc/dcache</tt> and non-static files are stored
+under <tt>/var/lib/dcache</tt> with log files in
+<tt>/var/log/dcache</tt>.</p>
+
+<p>The FHS compliant packages automatically create a user account
+(dcache) during installation and dCache will drop to this account
+during startup. An init script and a logrotation configuration is
+automatically installed. Admin door ssh keys are auto created during
+installation.</p>
+
+<p>The FHS layout allows software and users to predict the location of
+installed files and directories. The dCache packages available from
+EMI follow the FHS layout.</p>
+
+<p>Upgrading from 1.9.5 to the FHS packages of 1.9.12 is possible, but
+requires more manual work than upgrading to the classic layout.</p>
+
+<p>The classic layout on the other hand is not FHS compliant and is
+similar to the layout used by dCache 1.9.5. The packages at <a
+href="http://www.dcache.org/">www.dcache.org</a> use the classic
+layout and <b>this guide assumes that the classic layout is
+used</b>.</p>
+
+<p>We expect that all users will transition to the FHS packages and <a
+href="http://www.dcache.org/">www.dcache.org</a> will in the future
+host both layouts. Eventually we will stop distributing packages for
+<tt>/opt</tt>.</p>
+
+<h2>Upgrading from 1.9.5</h2>
+
+<p>Head nodes of 1.9.12 are compatible with pools from any release
+between 1.9.5 and 1.9.12 (both included). Pools from any release
+between 1.9.5 and 1.9.12 can be mixed. Beginning with the release of
+1.9.13 (primo July 2011) head nodes will only be compatible with pools
+belonging to release 1.9.12 and newer.</p>
+
+<p>Because new head nodes are compatible with old pools, it is
+possible to do a staged upgrade by first updating all head nodes (PNFS
+manager, pool manager, pin manager, space manager, SRM, all doors,
+monitoring services, etc) while leaving pools on the 1.9.5
+release. Once the head nodes are online again and confirmed to be
+working, pools can be upgraded one by one while dCache is
+online. Obviously the service will be slightly degraded as files on a
+pool that is being upgraded will be momentarily unavailable. Please
+notice that staged upgrade is not possible if pool nodes run any other
+dCache service (such as doors) besides the pool service.</p>
+
+<p>The alternative to a staged upgrade is to shutdown all dCache
+services and upgrade all nodes.</p>
+
+<p>In either case an inplace upgrade is possible and recommended: Most
+configuration files have changed format and quite a number of
+configuration properties have been renamed, yet a migration script
+provided with dCache 1.9.12 takes care of most conversions. dCache
+will refuse to start if it detects the old configuration files. You
+can read more about these changes in the following section.</p>
+
+<p>The first time dCache is started after the upgrade several
+databases will be updated: This includes the Berkeley DB Java Edition
+files on pools, the pin manager, the space manager, and a couple of
+schema tracking tables used by the SRM. The upgrade should be
+transparent, although the first start may be slightly slower than
+usual. Due to these schema changes, a downgrade from 1.9.12 is not
+possible without expert support and should not be attempted.</p>
+
+<p>Lots of components have been modified to improve consistency,
+robustness and add new features. In several cases this has affected
+the semantics of common operations in dCache. We recommend reading
+through the following sections, paying attention to issues like
+authorization, file ownership, multihoming, obsolete and forbidden
+configuration properties, and init scripts.</p>
+
+<p>The <tt>/opt/d-cache/libexec/migrate-from-1.9.5.sh</tt> script is
+provided to ease migration of an existing setup. This script creates
+<tt>/opt/d-cache/etc/dcache.conf</tt>,
+<tt>/opt/d-cache/etc/layouts/<em>hostname</em>.conf</tt> and
+<tt>/etc/default/dcache</tt> based on the
+<tt>/opt/d-cache/dCacheSetup</tt>,
+<tt>/opt/d-cache/etc/node_config</tt> and
+<tt>/opt/d-cache/config/*.poollist</tt> files. It also relocates
+<tt>dcache.local.sh</tt> and <tt>dcache.local.run.sh</tt> from
+<tt>/opt/d-cache/jobs/</tt> to <tt>/opt/d-cache/bin/</tt>, and admin
+door SSH keys from <tt>/opt/d-cache/config/</tt> to
+<tt>/opt/d-cache/etc/</tt>. The script is able to handle most
+installations, however the resulting <tt>dcache.conf</tt> file must
+always be adjusted as some properties have been obsoleted.</p>
+
+<p>Notice that the conversion will be incomplete if custom changes
+have been made to any batch file. Also custom Java settings (like heap
+size) will not be migrated. Such changes must be added, by hand,
+either to <tt>/opt/d-cache/etc/dcache.conf</tt> or
+<tt>/opt/d-cache/etc/layouts/<em>hostname</em>.conf</tt>.</p>
+
+<h2>New configuration files</h2>
+
+<p>The most visible change is the move to a new format for
+configuration files. After thorough considerations we concluded that
+the old configuration format was too restrictive to cover the full
+range of possible deployments of dCache, ranging from the smallest
+single process installations to the largest distributed installations
+running on thousands of hosts. At the same time the old format was in
+many places inconsistent, illogical, and hard to parse.</p>
+
+<p>The new format is not backwards compatible. Upgrading from 1.9.5 to
+1.9.12 requires that old configuration files are migrated to the new
+format. Care has been taken to provide an easy migration path. The
+process is assisted by a script supplied with dCache, however some
+manual steps are required to replace deprecated and obsolete
+configuration properties.</p>
+
+<p>Third party deployment scripts will have to be updated. The
+migration script provided with dCache may be of little use if such
+third party scripts are used.</p>
+
+<h3>The main configuration file</h3>
+
+<p>The main configuration file is
+<tt>/opt/d-cache/etc/dcache.conf</tt> and replaces
+<tt>/opt/d-cache/config/dCacheSetup</tt>. The file is optional. Most
+sites will want a non-empty <tt>/opt/d-cache/etc/dcache.conf</tt>
+that, at least, defines the <tt>dcache.layout</tt> parameter. This
+parameter identifies which layout file is to be used (the next section
+explains what a layout is).</p>
+
+<p>Most of the service specific configuration parameters known from
+the old <tt>/opt/d-cache/config/dCacheSetup</tt> file can still be
+defined in <tt>/opt/d-cache/etc/dcache.conf</tt>. Please consult the
+defaults in <tt>/opt/d-cache/share/defaults/</tt> for a complete list
+of parameters.</p>
+
+<p>The file follows the syntax of Java properties files. Values must
+not be put in qoutes. Any single or double qoute will become part of
+the value. A trailing backslash acts as a line continuation
+character. For technical information about the file format, see the <a
+href="http://download.oracle.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29">Java
+documentation</a>.</p>
+
+<h3>Layouts</h3>
+
+<p>Layouts describe which domains to run on a host and which services
+to run in each domain. Layouts replace
+<tt>/opt/d-cache/etc/node_config</tt> and are defined as files in the
+<tt>/opt/d-cache/etc/layout/</tt> directory. When starting, dCache
+will read a single layout file. The layout file is chosen by defining
+the <tt>dcache.layout</tt> property in
+<tt>/opt/d-cache/etc/dcache.conf</tt>; for example, specifying
+<tt>dcache.layout=single</tt> in <tt>/opt/d-cache/etc/dcache.conf</tt>
+will instruct dCache to read the layout file
+<tt>/opt/d-cache/etc/layouts/single.conf</tt> when starting.</p>
+
+<p>There are no longer any hard coded naming conventions regarding
+what a particular domain does. It is completely up to the layout to
+define which domains to run, what they are called and which services
+to run in them. The exception to the rule is <tt>dCacheDomain</tt>,
+which acts as the central message communication hub that all other
+domains connect to.</p>
+
+<p>Besides defining domains and the services to run in a domain, a
+layout defines domain and service specific configuration
+parameters. Any property that can be assigned in
+<tt>/opt/d-cache/etc/dcache.conf</tt> can be assigned a new value per
+domain or per service in the layout file.</p>
+
+<p>The syntax is easy to explain by example:</p>
+
+<blockquote class="two-columns">
+<pre>
+[dCacheDomain]
+[dCacheDomain/poolmanager]
+[dCacheDomain/broadcast]
+[dCacheDomain/loginbroker]
+[dCacheDomain/topo]
+
+[adminDoorDomain]
+[adminDoorDomain/admin]
+
+[spacemanagerDomain]
+[spacemanagerDomain/spacemanager]
+
+[namespaceDomain]
+[namespaceDomain/pnfsmanager]
+[namespaceDomain/cleaner]
+[namespaceDomain/acl]
+
+[dirDomain]
+[dirDomain/dir]
+
+[infoDomain]
+[infoDomain/info]
+
+[statisticsDomain]
+[statisticsDomain/statistics]
+
+[httpdDomain]
+[httpdDomain/billing]
+[httpdDomain/srm-loginbroker]
+[httpdDomain/httpd]
+
+[gPlazmaDomain]
+[gPlazmaDomain/gplazma]
+
+[utilityDomain]
+[utilityDomain/gsi-pam]
+[utilityDomain/pinmanager]
+
+# [${host.name}Domain]
+# [${host.name}Domain/pool]
+# name=pool1
+# path=/path/to/pool1
+
+# [${host.name}Domain/pool]
+# name=pool2
+# path=/path/to/pool2
+
+# [replicaDomain]
+# [replicaDomain/replica]
+
+# [dcap-${host.name}Domain]
+# [dcap-${host.name}Domain/dcap]
+
+# [xrootd-${host.name}Domain]
+# [xrootd-${host.name}Domain/xrootd]
+
+# [gridftp-${host.name}Domain]
+# [gridftp-${host.name}Domain/gridftp]
+
+# [webdav-${host.name}Domain]
+# [webdav-${host.name}Domain/webdav]
+
+# [gsidcap-{host.name}Domain]
+# [gsidcap-{host.name}Domain/gsidcap]
+
+# [srm-${host.name}Domain]
+# [srm-${host.name}Domain/srm]
+
+# [transfermanagersDomain]
+# [transfermanagersDomain/transfermanagers]
+</pre>
+</blockquote>
+
+<p>Lines in which the first non-whitespace character is a hash symbol
+are comment lines and are ignored. A name in square brackets, without
+a forward-slash defines a domain; for example,
+<tt>[gPlazmaDomain]</tt> defines a domain called
+<em>gPlazmaDomain</em>. A name in square brackets with a forward slash
+defines a service that is to run in a domain; for example,
+<tt>[gPlazmaDomain/gplazma]</tt> declares that the <em>gplazma</em>
+service is to be run in the <em>gPlazmaDomain</em> domain. A domain
+must be defined if services are to run in that domain. The order that
+services are defined in determines in which order the services are
+started; however, this order should not matter.</p>
+
+<p>The following illustrates how to start two GridFTP doors on the same
+host:</p>
+
+<blockquote>
+<pre>
+[gridftp-${host.name}-1Domain]
+[gridftp-${host.name}-1Domain/gridftp]
+port=2811
+cell.name=GFTP-${host.name}-1
+
+[gridftp-${host.name}-2Domain]
+[gridftp-${host.name}-2Domain/gridftp]
+port=2812
+cell.name=GFTP-${host.name}-2
+</pre>
+</blockquote>
+
+<p>This defines two domains, each containing a GridFTP door. Each door
+uses its own TCP port and each door has a unique cell name. Both
+domain and cell names are parameterised using the host name. Notice
+the dCache does not enforce any fixed scheme for domain
+naming. Neither does dCache enforce any fixed scheme for naming door
+cells.</p>
+
+
+<p>We recommend using the host name as the name of the layout. Often
+the main configuration file can be shared among all hosts in the
+dCache installation, with host specific settings being defined in the
+layout file. Using the host name for the layout allows dCache to be
+installed in a shared directory in, for instance, NFS or AFS. The
+layout reference in the main configuration file can be parameterized,
+for instance, <tt>dcache.layout=${host.name}</tt>.</p>
+
+<h3>Default values</h3>
+
+<p>Default values specified by dCache.org are supplied as properties
+files in <tt>/opt/d-cache/share/defaults/</tt>. Those files should not
+be modified as any modification will be lost when upgrading. These
+files do however serve as succinct documentation for all available
+configuration parameters and their default values.</p>
+
+<p>Properties defined in the default files may have been tagged. The
+tags appear in parentheses as prefixes or property names (eg
+<tt>(deprecated,not-for-services)logArea</tt>).  These tags affect how
+properties are interpreted by dCache and the tags should not be
+included when defining properties in configuration files. The tags
+used are:</p>
+
+<dl>
+<dt>deprecated</dt>
+<dd>The property is still supported, but alternatives are
+available. The property will be obsoleted in a future release. dCache
+will generate warnings when such properties are defined.</dd>
+
+<dt>obsolete</dt>
+<dd>The property is no longer used. dCache will generate
+warnings when such properties are defined.</dd>
+
+<dt>forbidden</dt>
+<dd>The property is no longer used. dCache will fail to start
+when such properties are defined.</dd>
+
+<dt>not-for-services</dt>
+<dd>Many properties can be defined globally, for a specific domain or
+for a specific service. Properties marked <em>not-for-services</em>
+have no effect when defined for a service and dCache will generate
+warnings when such properties are defined.</dd>
+</dl>
+
+<p>Some properties are scoped for a specific service. Such properties
+are prefixed by the service name and a forward slash (eg
+<tt>dcap/port</tt>). These properties only take effect for instances
+of the specific service. When defining the properties for a particular
+service instance the prefix should not be repeated. If the properties
+are defined globally or for a domain, then the prefix must be included
+(otherwise the default value will take precedence).</p>
+
+<p>The <tt>/opt/d-cache/bin/dcache check-config</tt> command provides
+diagnostic information about obsolete and deprecated properties and
+other problems in the configuration and layout files.</p>
+
+<h3>Pools</h3>
+
+<p>The <tt>/opt/d-cache/config/<em>hostname</em>.domains</tt> and
+<tt>/opt/d-cache/config/*.poollist</tt> files are no longer used to
+define pools. Instead pools are defined in the layout like any other
+service:</p>
+
+<blockquote>
+<pre>
+[myPoolDomain/pool]
+name=pool1
+path=/san/pool1
+lfs=precious
+tags=hostname=${host.name}
+waitForFiles=${path}/data
+maxDiskSpace=2T
+</pre>
+</blockquote>
+
+<p>The only required parameters are <tt>name</tt> and <tt>path</tt>.
+The <tt>path</tt> property defines in which directory files are to be
+stored.  The <tt>data/</tt> and <tt>control/</tt> subdirectories
+appear under that path (<tt>/san/pool1/data/</tt> and
+<tt>/san/pool1/control/</tt> for the above example).  The
+<tt>name</tt> property defines the name of the pool; <tt>pool1</tt> in
+the above example.</p>
+
+<p>Other parameters that may be set include <tt>lfs</tt> (the example
+pool has LFS mode <tt>precious</tt>), <tt>tag</tt> (the example pool
+has the tag <tt>hostname</tt> set to the host name) and
+<tt>maxDiskSpace</tt> (the example pool has a size of 2
+Tebibytes).</p>
+
+<p>The <tt>/opt/d-cache/bin/dcache pool create</tt> command updates
+the layout file when creating a pool. In versions before dCache 1.9.7
+this functionallity was available as the separate <tt>dcache pool
+add</tt> command. As a consequence of this consolidation, the
+parameters accepted by <tt>dcache pool create</tt> have changed;
+please consult the help output of the script or the man page for
+details.</p>
+
+<p>If pools are created on a SAN or cluster file system and there is a
+risk that a pool is not mounted at the time dCache starts, the
+<tt>waitForFiles</tt> parameter may be used to delay pool startup
+until particular paths are available. This prevents that a new pool is
+accidentally created in the mount point. In the example above the pool
+waits for the data directory (<tt>${path}/data</tt>) to become
+available.</p>
+
+<p>Notice that the setup file in the pool directory is no longer
+required. It is parsed if present, but if not present then default
+values will be assumed. If neither the configuration file nor the
+setup file specify a value for <tt>maxDiskSpace</tt>, then a limit is
+derived from the size of the file system.</p>
+
+<h3>Locating Java</h3>
+
+<p>As dCache no longer parses any configuration files from shell
+scripts, the location of the Java binary cannot be defined in the main
+configuration file. dCache relies on the standard environment variable
+<tt>JAVA_HOME</tt> to define the location of Java. If Java is in the
+shell's search path, then <tt>JAVA_HOME</tt> is not required.</p>
+
+<p>If <tt>JAVA_HOME</tt> cannot be defined as a global environment
+variable in the operating system, then it can be defined in either
+<tt>/etc/default/dcache</tt> or <tt>/etc/dcache.env</tt>. These two
+files are sourced by the init script and allow <tt>JAVA_HOME</tt> and
+<tt>DCACHE_HOME</tt> to be defined.</p>
+
+<p>As an alternative to defining <tt>JAVA_HOME</tt> one can define
+<tt>JAVA</tt> to point directly to the Java executable.</p>
+
+<h2>Name space backends</h2>
+
+<p>dCache no longer mounts the name space. For Chimera this is not
+needed anyway, and for PNFS it is only needed for PnfsManager. As
+PnfsManager normally runs on the same host as PNFS itself, the PNFS
+init script will already have mounted the name space.</p>
+
+<h3>PNFS</h3>
+
+<p>The script <tt>/opt/d-cache/install/install.sh</tt>, which used to
+initialize PNFS among other things, is no longer shipped with dCache.
+This functionality is now available in
+<tt>/opt/d-cache/install/preparePnfs.sh</tt> and only needs to be run
+once on initial install. There is no reason to run this script on
+upgrade. The scrit only applies to PNFS. The initialization procedure
+for Chimera is described in the dCache book.</p>
+
+<h3>Chimera</h3>
+
+<p>The Chimera NFS3 name space daemon has been embedded into
+dCache. It is now available as the service <tt>nfsv3</tt> and can be
+added to the dCache layout file.  The domain that is configured to run
+the <tt>nfsv3</tt> service may be started and stopped with
+<tt>/opt/d-cache/bin/dcache</tt>, in keeping with all other dCache
+domains.  The old Chimera init script (<tt>chimera-nfs-run.sh</tt>) is
+no longer provided.</p>
+
+<p>The Chimera client utilities have been moved to
+<tt>/opt/d-cache/bin/</tt>.</p>
+
+<p>The Chimera configuration file has been replaced by properties in
+<tt>/opt/d-cache/etc/dcache.conf</tt>. Available properties and
+documentation can be found in
+<tt>/opt/d-cache/share/defaults/chimera.properties</tt>. The default
+database user of Chimera has changed from <tt>postgres</tt> to
+<tt>chimera</tt>. Please update your database or set
+<tt>chimera.db.user</tt> when upgrading from a previous version of
+dCache.</p>
+
+<p>The Chimera name space provider has been updated such that the
+OSMTemplate and sGroup directory tags are optional.</p>
+
+<p>
+For performance reasons dCache with PNFS only verified the lookup
+ permissions of the directory containing the file system entry
+ corresponding to the path. I.e., only the lookup permissions for the
+ last parent dirctory of the path were enforced. For compatibility
+ reasons Chimera inherited these semantics.
+<br>
+Starting with dCache 1.9.12-22 the new
+property <tt>pnfsVerifyAllLookups</tt> has been introduced to enable
+the verification of the lookup permissions of all directories of a
+path. When this property is set to <tt>true</tt>, Chimera will verify
+the lookup permissions of all directories of a path.
+<br>
+This change requires that chimera users recreate the stored
+procedures by <tt>psql -U <user> chimera -f
+/opt/d-cache/libexec/chimera/sql/pgsql-procedures.sql</tt> and
+substitute <tt>&lt;user&gt;</tt> by the proper database role. Please
+note that this new funcitionality is disabled by default. You can
+enable it by setting <tt>pnfsVerifyAllLookups=true</tt>.
+</p>
+
+<p>Initial support for using Enstore with Chimera was added. Please
+contact support@dcache.org for details.</p>
+
+<h2>User mapping and authorization</h2>
+
+<p>As before, dCache uses gPlazma as a user mapping and black
+listing service. Authorization decisions are performed by several
+components, in particular in PNFS manager and space manager, but also
+in pool manager, pin manager and in doors.</p>
+
+<p>Although the overall design of user mapping and authorization
+hasn't changed, the details have been completely redesigned. This was
+done to get rid of inconsistencies and limitations of the old
+scheme. Due to the inconsistencies in earlier versions, it may be hard
+to predict when existing installations need to be adjusted. Instead we
+try to describe the process used in 1.9.12.</p>
+
+<p>Users authenticate with dCache doors. Typically this will be via
+GSI or SSL, but may also be through Kerberos or user name and
+password. The door presents the user identity and credentials to
+gPlazma, which will complete the authentication step, consult
+blacklistings, and map the user identity to a UID and one or more
+GIDs, one of which will be the primary or effective GID. gPlazma also
+associates the request with session attributes such as the user's home
+directory, root directory and whether the user is limitted to read
+only access.  How these steps are perform depends on the plugins used
+and whether gPlazma 1 or 2 is used.</p>
+
+<p>The outcome of gPlazma is given back to the door. The door will
+include the UID, the GIDs, and possibly the DN, FQANs and mapped user
+name when talking to other services in dCache. These services use the
+principals when making authorization decisions. PNFS manager
+authorizes file system access by UID and GID. Space manager authorizes
+writes to link groups by mapped user name or FQAN. Pool manager
+authorizes staging by DN, FQAN or mapped user name. Pin manager
+authorizes by UID and GID.</p>
+
+<p>Although a single GID and a single FQAN is considered primary, all
+GIDs and all FQANs are consulted when using these for authorization
+decisions. For instance, a user that presented FQANs from several VOs
+is authorized to write to the link groups of both VOs regardless of
+which FQAN was the primary FQAN. The same user is also authorized to
+stage files for both VOs regardless of the order of FQANs (assuming
+the FQANs are authorized to stage files).</p>
+
+<p>The primary group (whether identified by GID or FQAN) is however
+used for defining ownership for objects created by the user. Files or
+directories created by the user receive the UID and primary GID of the
+request (althogh PNFS manager can be forced to inherit ownership from
+the parent directory).</p>
+
+<p>Notice that the mapping to UID and GID are defined entirely by
+gPlazma plugins. Traditionally these plugins supported rather
+flexible, although possibly illogical, mappings. For instance, FQANs
+can be mapped to UID and GID pairs. Since a proxy certificate likely
+contains several FQANs this could correspond to multiple UIDs, yet
+dCache only allows a single UID. dCache still supports these
+mappings. In case of conflicts, the first mapping obtained controls
+the UID that is chosen, and also provides the home and root
+directories and whether the session is a read only session. For
+mappings controlled by FQANs the first mapping is that of the primary
+FQAN if that FQAN has a mapping. Otherwise an arbitrary FQAN with a
+mapping is chosen.</p>
+
+<p>The above description applies to all doors (DCAP, FTP, HTTP/WebDAV,
+xrootd, SRM, NFS). We are aware that this change will possibly force
+configuration changes during upgrade. We are however convinced that
+the more consistent authentication, mapping and authorization logic is
+worth the effort.</p>
+
+<h2 id="logging">Logging</h2>
+
+<p>Many users have been dissatisfied with the complexity of adjusting
+log levels at runtime. For some time dCache has relied on log4j as its
+logging framework. Log4j is no longer maintained and there was no way
+for us to simplify the logging user interface within the constraints
+of log4j. Therefore dCache has switched from log4j to logback.</p>
+
+<p>The first consequence is that the log configuration file has
+changed. Now logging is configured in
+<tt>/opt/d-cache/etc/logback.xml</tt>. For further details see the
+instructions embedded in the packaged version of that file and <a
+href="http://logback.qos.ch/manual/configuration.html">chapter 3 of
+the logback manual</a>. dCache configuration properties are accessible
+using <em>${...}</em> placeholders in <tt>logback.xml</tt>.</p>
+
+<p>Note that log level configuration in dCache is
+different from what is described in the logback manual. Pure logback
+allows log levels to be configured on loggers and appenders, similar
+to log4j. This has proven to be too restrictive for dCache. We ship
+dCache with a custom log filter that implements a log level for each
+triple of logger, appender and cell. This provides very fine grained
+control over which types of messages from which cell are logged
+where. Detailed instructions can be found in the instructions embedded
+in the default <tt>/opt/d-cache/etc/logback.xml</tt> file.</p>
+
+<p>The second consequence of switching to logback is that the cell
+admin interface for changing log levels on-the-fly has changed. The
+legacy <tt>set printout</tt> commands no longer have any effect. The
+commands that were prefixed with <tt>log4j</tt> are no longer
+supported. Instead a new set of commands prefixed with <tt>log</tt>
+have been introduced. Each cell exposes these commands to adjust the
+log level of logger hierarchies for specific appenders within that
+cell. In the simplest case one can adjust the log level of all loggers
+for a particular appender with:</p>
+
+<blockquote>
+  <tt>log set stdout DEBUG</tt>
+</blockquote>
+
+<p>or</p>
+
+<blockquote>
+  <tt>log set pinboard DEBUG</tt>
+</blockquote>
+
+<p>Notice that these commands only affect the cell and its subcells in
+which they are executed. In previous versions of dCache, adjusting the
+log levels affected all cells.</p>
+
+<p>The system cell has additional commands that allow appenders to be
+attached and detached as needed, although it is unlikely that these
+will need to be adjusted at runtime.</p>
+
+<p>We recommend consulting the logback manual for details about
+available appenders. Logback can be configured to perform log
+rotation, log to syslog, log to SMTP, log to a remote logger,
+etc. Feel free to contact us for details about specific setups.</p>
+
+<h2>Database related changes</h2>
+
+<p>The minimum version of PostgreSQL support by dCache 1.9.12 is
+PostgreSQL 8.4. If you use an older version of PostgreSQL then please
+upgrade it <em>before</em> upgrading dCache.</p>
+
+<p>The JPOX ORM has been replaced by <a
+href="http://www.datanucleus.org/">DataNucleus</a>. This affects the
+database used by the SRM transfer managers, the pin manager and SRM.
+The tables used by the transfer managers and the SRM have not changed,
+however the tables used by the ORM to track schema changes have been
+changed. Upon upgrade the schema will be updated by DataNucleus.</p>
+
+<p>The pin manager was rewritten and uses a new schema. The schema is
+maintained with the <a href="http://www.liquibase.org/">LiquiBase
+schema management library</a>. LiquiBase itself adds two tables to
+track schema changes.</p>
+
+<p>Both changes affect the ability to downgrade to previous versions
+of dCache. Please contact support@dcache.org for details on how to
+downgrade from dCache 1.9.12 if needed.</p>
+
+<p>The <tt>/opt/d-cache/bin/dcache</tt> script has been updated with
+several new commands related to databases used by various
+services. The subcommand <tt>database ls</tt> lists the databases used
+by services on this host and is supported by all services that use an
+external database.</p>
+
+<p>Other database subcommands only apply to services using the
+LiquiBase schema management library. Currently pin manager is the only
+service that uses this library. Please consult the man page for
+details about these commands.</p>
+
+<h2>Multihoming</h2>
+
+<p>It is quite common to deploy dCache on hosts with multiple network
+interfaces. Typically there is an internal network for communicating
+with the CPU farm and for internal dCache communication, and an
+external network for communicating with the rest of the world.</p>
+
+<p>In various scenarios dCache services (specifically doors and pools)
+have to provide a network address to a client or to another service in
+dCache. To avoid unnecssary DNS lookups and reverse lookups and to
+avoid inconsistencies, dCache now always uses the IP address of an
+interface internally. In earlier versions dCache sometimes performed a
+reverse lookup on the IP address and provided the DNS name. Besides
+being slow, this could lead to inconsistencies. The algorithm for
+selecting a network interface was changed and unified. This section
+describes when dCache needs to provide a network address, and
+describes how dCache selects the interface.</p>
+
+<p>The network address of a door is needed:</p>
+
+<ul>
+<li>When the info provider publishes the address of a door.</li>
+<li>When the SRM generates TURLs pointing to a door.</li>
+<li>When a door acts as proxy for a pool and the pool must know the
+address of the door.</li>
+</ul>
+
+<p>The network address of a pool is needed:</p>
+
+<ul>
+<li>When a file needs to be transferred from one pool to another pool
+(a pool to pool copy).</li>
+<li>When using a passive data transfer protocol in which the pool
+provides an address to which the client connects (most protocols
+support a passive mode).</li>
+</ul>
+
+<p>Whenever possible, dCache services try to select an interface that
+faces the client. This requires that dCache knows the address of the
+client that is supposed to connect to the service. dCache uses the
+routing table to determine which interface the host would use to talk
+to the client. It is assumed that communication is symmetric and
+traffic from the client would be received on the same interface.</p>
+
+<p>Automatically selecting the correct interface is for instance
+possible for passive data transfer protocols in which a pool provides
+an address to the door, which then provides that address to the
+client. In this case the door knows the remote address of the client
+and it is assumed that the data connection to the pool is performed
+from the same network. That is, a client connected to the door from
+the external network would also connect to the pool from the external
+network.</p>
+
+<p>The benefit of the above scheme is that the correct interface is
+provided no matter whether a local client or an external client
+transfers a file. Care must however be taken with third party
+transfers. For instance, a local client which initiates a third party
+transfer from an external storage system to the local dCache should
+contact the door over the external network. This is because the data
+connection to the pool is created from the external storage system
+rather than the local client, and it is thus paramount that the pool
+selects its external interface.</p>
+
+
+<p>In some cases an interface cannot be selected automatically. This
+is for instance the case when transferring the file from one pool to
+another: Pools have no knowledge about the addresses of other pools
+and thus have no means to select the correct interface. The same
+problem arrises when doors act as proxies and provide their address to
+a pool. In such cases the service resolves the fully qualified domain
+name of the host and provides that address. This means that the
+content of <tt>/etc/hosts</tt> and the hostname influences which
+interface is selected.</p>
+
+<p>Many service allow the interface to use to be specified in the
+configuration. Pools provide the <tt>pp set listen</tt> command to
+specify the interface on which to accept pool to pool transfers, and
+most doors have a configuration option to specify the interface to
+provide to doors when acting as proxies.</p>
+
+<h2>Pool</h2>
+
+<h3>Performance and meta data</h3>
+
+<p>The Berkeley DB library has been updated. The new version uses a
+new file format. The library is backwards compatible, meaning it can
+read data from previous versions. However old versions are not forward
+compatible with the new version. Thus once a pool has been upgraded to
+1.9.12, it is not possible to downgrade to a previous version without
+restoring the meta data information. This only affects pools using the
+Berkeley DB backend.</p>
+
+<p>Pools now remove stale meta data entries on startup. This will
+affect pool startup speed, but ensures that stale entries are removed
+from the <tt>control/</tt> and <tt>meta/</tt> directories.</p>
+
+<p>Under high load, pools in 1.9.5 have been reported to become
+unresponsive to interactive commands. This is most likely to happen if
+the Berkeley DB used for meta data is on the same physical disks as
+the pool data. Heavy I/O can cause meta data queries to starve. To
+improve responsiveness in these situations, message processing is now
+performed by a pool of threads rather than by a single thread.</p>
+
+<p>In dCache 1.9.1 the meta data store of pools was rewritten. The
+rewrite solved some longstanding issues with space accounting in
+pools. At the time we decided on a single global lock on any meta data
+operation, as that made it significantly easier to design the
+component. Since the meta data store is backed by an on-disk
+representation, the single lock has proven to be a bottleneck during
+high load. In dCache 1.9.10 the single lock was replaced by more fine
+grained locking. This improves throughput to the meta data store.</p>
+
+<p>One immediate benefit of the more fine grained locking is that a
+pool is enabled in read-only mode while the meta data is still being
+read. This is in particular of benefit when the meta data has been
+destroyed and needs to be recovered from PNFS: Computing the checksum
+during such recovery takes a while and would in previous releases
+block access to all files on the pool. With the above change, clients
+will be able to read a file as soon as the meta data of that
+particular file was recovered. Any write operation is blocked until
+all meta data has been verified.</p>
+
+<h3>Volatile Pools</h3>
+
+<p>The implementation of volatile pools has been refactored: The LFS
+policy now only applies to client uploads and when recovering meta
+data. In other cases the state of the replica will be set as
+usual. For instance when migrating files to a volatile pool using the
+migration module, those files would previously be marked CACHED no
+matter what was requested by the migration task. On the other hand,
+volatile pools now correctly ignore the access latency and retention
+policy of files. In earlier versions files written with access latency
+ONLINE would be marked sticky even when written to volatile pools.</p>
+
+<h3>Queues</h3>
+
+<p>The code base for queue management in pools has been cleaned up. As
+a consequence the definition of default queues has changed. In
+previous releases the default queue happened to be the first queue
+defined. Starting with 1.9.9, a queue called 'regular' is always added
+and the list of custom queues must not contain a default queue. All
+pools that define the poolIoQueue configuration parameters must be
+reconfigured when upgrading to 1.9.9.</p>
+
+<p>Since the poolIoQueue parameter no longer contains the default
+queue, it is not possible to configure the default queue in LIFO
+mode. This is a regression that will be resolved in a future
+release.</p>
+
+<p>The queue used for pool to pool transfers is now a regular queue
+called <em>p2p</em>. It can be managed using the <tt>mover</tt>
+commands in the admin shell. The commands <tt>p2p remove</tt> and
+<tt>p2p kill</tt> are obsolete. Third party scripts that use these
+commands have to be updated.</p>
+
+<p>Mover states have changed. This affects the output of the <tt>mover
+ls</tt> command as well as the <em>Active Transfers</em> page in the
+monitoring interface. Third party scripts may need to be adapted.</p>
+
+<h3>Tape support</h3>
+
+<p>The checksum module was extended with an <tt>onflush</tt>
+switch. This forces the pool to compute checksums on files before
+flushing them to tape. The computed checksum is compared to a known
+checksum and the flush fails in case of mismatch. If a checksum is not
+known already, then the computed checksum is stored in the name
+space.</p>
+
+<h3>Migration module</h3>
+
+<p>The migration module was significantly enhanced. A new expression
+language allows for more flexibility in pool selection, job
+termination, and job suspension. Use cases include suspending a job
+during high load, excluding target pools with high load, and
+terminating a job after a certain amount of data has been
+moved. Please consult the help output of the <tt>migration copy</tt>
+command, or the dCache book.</p>
+
+<p>The migration module has been extended with the <tt>-order</tt>
+option. This option makes it possible to specify a sort order for
+migration jobs, e.g. oldest files first.</p>
+
+<p>The migration module was extended to reduce interference between
+multiple migration jobs running on the same pool. The migration module
+now respects the pool mode on the target pool.</p>
+
+<h3>Pool rebalancing</h3>
+
+<p>A common problem when adding new pools to dCache is that the new
+pools have significantly more free space than full pools. They
+naturally attract more data and thus are subject to overload during
+transfer peaks. Since data is often read back in the same batches in
+which they were written, this problem persists even after the new pool
+has been filled with data.</p>
+
+<p>To address this issue many sites have moved files from old pools to
+new pools to even out the load. Before the introduction of the
+migration module, this task required manually moving files behind the
+back of dCache (e.g. using scp or rsync). With the introduction of the
+migration module in dCache 1.9.1 this task became simpler and safer,
+but still required that migration jobs were defined by hand on the old
+pools - and cancelled once enough data had been moved.</p>
+
+<p>In dCache 1.9.10 a couple of new commands were added to pool
+manager to rebalance pool groups. These commands automate generating
+migration jobs. The migration jobs generated this way rely heavily on
+the new features added to the migration module in 1.9.10 and will only
+work with new pools.</p>
+
+<p>Pool manager maintains no state about the migration jobs started by
+the rebalance commands. All such jobs however share a command job id,
+<em>rebalance</em>, that makes them easy to identify. Pool manager will
+cancel existing rebalance jobs on a pool before starting a new
+job. Pool manager also provides a command to cancel all such jobs
+within a pool group. Please read the help of the <tt>rebalance
+pgroup</tt> command for details or consult the dCache book.</p>
+
+<p><b>DISCLAIMER</b>: This feature is experimental. We urge all sites
+to carefully test this feature before using it on a production system,
+as well as monitoring the system while rebalancing is in progress. The
+task of moving files between pools is handled by the migration module,
+which has been used successfully by many sites since its introduction
+in dCache 1.9.1. The rebalancer will however stress the migration
+module much more than a typical migration job.</p>
+
+
+<h2>SRM</h2>
+
+<p>SRM is available as a service called <tt>srm</tt> and can be
+enabled in the layout file.</p>
+
+<h3>The Jetty container</h3>
+
+<p>In contrast to dCache 1.9.5, the SRM service uses Jetty as a
+container rather than Tomcat. Jetty provides a much more smooth
+integration of the SRM with the rest of dCache. Some of the advantages
+are:</p>
+
+<ul>
+<li>No need to run <tt>install.sh</tt> on every upgrade.</li>
+<li>No separate log file configuration.</li>
+<li>Log files are stored the same place as all other dCache log files.</li>
+<li>Faster startup.</li>
+<li>More protocol options.</li>
+</ul>
+
+<p>Jetty has the option of using synchronous and asynchronous IO. In
+previous versions, dCache always used synchronous IO for the SRM. The
+consequence was that each TCP connection required its own thread. This
+limited the maximum number of TCP connections the SRM could
+efficiently maintain. Since dCache 1.9.10 the SRM can optionally use
+asynchronous IO. This will only make a difference if clients use HTTP
+keep alive to keep the TCP connection open for some time while the
+connection is idle. Whether to use synchronous or asynchronous IO can
+be configured using the <tt>srmJettyConnectorType</tt> property.</p>
+
+<p>Traditionally the SRM door failed to reload the host certificate
+and CA certificates and required a restart whenever these were
+updated. Since dCache 1.9.10 both host certificates and CA
+certificates can be reloaded periodically. The refresh period can be
+configured using the <tt>hostCertificateRefreshPeriod</tt> and
+<tt>trustAnchorRefreshPeriod</tt> properties. The default is to reload
+every 12 hours.</p>
+
+<p>The SRM protocol usually relies on HTTP over GSI as a transport. In
+dCache 1.9.11 HTTPS was added as a transport option for the SRM. The
+main benefits of using HTTPS rather than HTTP over GSI is that HTTPS
+is a standard protocol and has support for sessions, improving latency
+in case a client needs to connect to the same server several
+times. Our current implementation does not offer a delegation
+service. Hence <em>srmCopy</em> will not work with SRM over HTTPS. We
+are working on adding a separate delegation service in a later
+release.</p>
+
+<p>There are currently no clients with SRM over HTTPS support
+available for download, but both the dCache SRM clients and the ARC
+clients are in the process of being updated to support the new
+transport.</p>
+
+<p>To enable HTTPS as a transport, set <tt>srmGssMode</tt> to
+<tt>SSL</tt>. In the current version the SRM can only run in either
+SSL or GSI mode. To support both, two SRM instances have to be
+created. For such a deployment it is essential that the two SRM
+instances use two different databases.</p>
+
+<h3>Synchronous vs asynchronous processing</h3>
+
+<p><em>The subject dicussed below is unrelated to the use of
+synchronous or asynchronous IO discussed in the previous
+section.</em></p>
+
+<p>The SRM protocol allows most requests to be treated either
+synchronously or asynchronously. In the former case the client will
+not receive a reply until the request was processed by the server. In
+the latter case the server will reply that the request is accepted and
+then the client periodically asks (polls) the server about the status
+of the request.</p>
+
+<p>Traditionally dCache would treat list requests synchronously, and
+put, get and bring online requests asynchronously. Starting with
+dCache 1.9.3 the behaviour of lists was configurable. Since dCache
+1.9.10 the behaviour for both list, get, put and bring online is
+configurable. One does not have to choose between either synchronous
+or asynchronous operation. dCache can be configured to use synchronous
+replies for fast requests, and switch to asynchronous processing for
+slow requests. The switch over period is configurable. When configured
+to 0 all replies are asynchronous. When configured to infinity all
+replies are synchronous. The upside of synchronous replies is lower
+CPU overhead since this avoids repeated authentication, and lower
+latency from the point of view of the user (an asynchronous request
+will always take at least the time between the initial request and the
+first status poll - typically four seconds). The downside of
+synchronous replies is that the request occupies a thread in the SRM
+door. A conservative switch over time of a few seconds is unlikely to
+cause problems on the server. The period before the SRM switches to
+asynchronous mode can be configured with the
+<tt>srm*SwitchToASynchronousModeDelay</tt> parameters in
+<tt>/opt/d-cache/etc/dcache.conf</tt>. The default value is one
+second.</p>
+
+<h3>Database</h3>
+
+<p>The SRM uses a database to persist all SRM requests. This has the
+advantage that the SRM door can be restarted and requests can be
+restored from the database. It also means that one can extract
+information about already completed SRM requests, which is great for
+monitoring and debugging. The aggressive updates of the database may
+however be a bottleneck for SRM scalability. Continous persistence can
+now be disabled using the parameters <tt>srmDatabaseEnabled</tt>
+(defaults to true) and <tt>srmStoreCompletedRequestsOnly</tt>
+(defaults to false).</p>
+
+<p>Most of the persistence setting are now configurable per request
+type. This allows, for instance, the period for how long requests are
+kept in the database to be configured seperately for uploads,
+downloads and list requests.</p>
+
+<p>The SRM used to have the ability to periodically submit
+<tt>vacuum</tt> commands to the database. This command is PostgreSQL
+specific and thus tied the SRM to PostgreSQL.  PostgreSQL has for
+quite a while supported auto vacuuming, and manually executing the
+vacuum command is no longer necessary. We have therfore removed the
+submission of <tt>vacuum</tt> commands from dCache. The configuration
+parameters <tt>srmVacuum</tt> and <tt>srmVacuumPeriod</tt> are
+obsolete. PostgreSQL 8.4 is the minimum version of PostgreSQL
+supported by dCache.</p>
+
+<h3>File size validation</h3>
+
+<p>The SRM protocol allows the client to provide the expected file
+size before actually uploading the file. dCache uses this file size to
+reserve sufficient space for the file. Since dCache 1.9.11 the file
+size is also propagated to PoolManager and the pool receiving the
+upload. PoolManager uses the file size in its pool selection. The pool
+uses the file size to verify the integrity of the file after
+upload. If the file size does not match, the pool will flag the
+transfer as having failed and will delete the file.</p>
+
+<h3>HTTP support for third party transfers</h3>
+
+<p>The <em>RemoteHttpTransferManager</em> cell has been removed. The
+functionality has been merged into the
+<em>RemoteGsiftpTransferManager</em> cell, which in turn has been
+renamed to <em>RemoteTransferManager</em>. The SRM was extended to
+support third party srmCopy transfers from HTTP resources. Third party
+upload to HTTP resources and support for HTTPS is not available yet in
+the SRM.</p>
+
+<h2>Pin manager</h2>
+
+<p>The pin manager is responsible for staging and pinning files on
+behalf of SRM and DCAP doors. In this release the pin manager has been
+reimplemented from scratch. The design has been significantly
+simplified to increase performance and robustness of this critical
+component.</p>
+
+<p>The database schema is separate from the old implementation's
+schema. The new schema is created the first time the pin manager is
+started. Existing pins are automatically imported if the same database
+is used. We strongly recommend using the same database. The tables of
+the old pin manager are not deleted, however downgrading is not
+possible without loosing the pins that were created with the new pin
+manager.</p>
+
+<p>The command line interface of the pin manager has changed slightly
+and third party scripts may have to be updated.</p>
+
+<p>DCAP supports prestaging from tape. The DCAP door used to rely on a
+stager service to perform the staging.  In dCache 1.9.12 the DCAP door
+instead uses the pin manager to trigger staging. The
+<tt>dummy-prestager</tt> service is obsolete and can be deleted from
+the layout.</p>
+
+<h2>PNFS manager</h2>
+
+<p>Since version 1.9.5 dCache has had the option to do authorization
+in the door or in PNFS manager. File access authorization is now always
+done in PNFS manager. Code to perform permission checks in doors
+has been removed. The configuration parameter
+<tt>permissionPolicyEnforcementPoint</tt> is obsolete.</p>
+
+<p>One consequence of the above change is that ACL support only needs
+to be enabled on the node hosting the PNFS manager. All other services
+ignore the ACL settings. If ACL checks are enabled, please double
+check that ACL checking is enabled and configured on the node hosting
+the PNFS manager. Another consequence is that ACLs are now enforced
+for all supported protocols, including all SRM operations.</p>
+
+<p>dCache has traditionally placed a lot of logic in protocol specific
+doors. Over time this has caused the semantics of various operations
+to diverge slightly, depending on which protocol is used. To counter
+this, the logic that decides the ownership of a new name space entry
+was moved into PNFS manager. This change altered the behaviour of some
+doors. The new behaviour is closer to POSIX: the default ownership of
+a new name space entry is the UID and primary GID of the user creating
+the entry. There are two exceptions: if the entry was created by an
+anonymous user then the ownership is inherited from the parent
+directory; if <tt>pnfsInheritFileOwnership</tt> is set to true in
+<tt>/opt/d-cache/etc/dcache.conf</tt> then entries created by
+authenticated users will also have ownership inherited from the parent
+directory.</p>
+
+<h2>Pool manager</h2>
+
+<p>dCache no longer ships with
+<tt>/opt/d-cache/config/PoolManager.conf</tt>. The equivalent default
+values are now embedded in a batch file. As before, the PoolManager
+uses <tt>/opt/d-cache/config/PoolManager.conf</tt> to store its
+setup. The ONLY difference is that dCache no longer ships with a
+<tt>/opt/d-cache/config/PoolManager.conf</tt> file. This was changed
+to avoid the risk of the default <tt>PoolManager.conf</tt> overwriting
+a custom <tt>PoolManager.conf</tt> file on upgrade.</p>
+
+<p><b>IMPORTANT:</b> Before restarting PoolManager after upgrade,
+please verify that your custom <tt>PoolManager.conf</tt> is in
+place. The RPM contains instructions to preserve custom
+<tt>PoolManager.conf</tt> files, however we recommend to verify the
+presence of the file before starting dCache after upgrading.</p>
+
+<h2>Space manager</h2>
+
+<p>One task of space manager is to select the link group to use for
+writes. Space manager uses a link group authorization file to
+determine which link groups a user is allowed to write to.</p>
+
+<p>One challenge space manager has is when a user is authorized to
+write to multiple link groups. This can for instance be the case when
+the user has multiple FQANs. In previous releases the space manager
+would choose the first link group the user is authorized to write
+to. There is however no guarantee that the link group selected by the
+space manager contains links serving the given path. If this happened
+the write would fail because no write pools were configured for this
+file in the link group chosen by space manager.</p>
+
+<p>Starting with dCache 1.9.9 space manager queries pool manager to
+select the proper link group. The query guarantees that space manager
+selects a LinkGroup with a link that allows the given file to be
+written. To reduce the cost of the new query, it is only generated for
+writes with implicit space reservation and only if the user is
+authorized to more than one link group.</p>
+
+<p>The link group authorization file was extended to support wild card
+matches for FQANs.</p>
+
+<h2>gPlazma</h2>
+
+<p>The gPlazma cell was rewritten. The admin interface of the gPlazma
+cell has been replaced. The output of the <tt>info</tt> command has
+changed. Third party scripts that query the gPlazma cell through the
+admin interface will have to be updated.</p>
+
+<p>gPlazma request timeouts are now defined by the door making the
+request. As a consequence the configuration parameter
+<tt>gPlazmaRequestTimeout</tt> is now obsolete.</p>
+
+<p>The gPlazma module has been replaced by an embedded instance of the
+new gPlazma cell running in the same domain as the doors. The
+configuration parameters have not changed. If gPlazma is configured to
+run as a module then the cell will automatically be started in every
+domain hosting a door.</p>
+
+<h2>gPlazma 2</h2>
+
+<p>Despite its name, gPlazma 1 was not actually a pluggable
+framework. gPlazma 2 tries to address this issue. It is rewritten from
+scratch with a well defined plugin interfaces and a dynamic plugin
+loader mechanism.</p>
+
+<p>gPlazma 2 is enabled by defining <tt>gplazma.version=2</tt> in
+<tt>dcache.conf</tt> and is configured through a new configuration
+file: <tt>/opt/d-cache/etc/gplazma.conf</tt>. The file follows a PAM
+like syntax. The following is an example of a gPlazma 2 configuration
+file:</p>
+
+<blockquote>
+<pre>
+auth    optional  voms
+auth    optional  x509
+map     optional  vorolemap
+map     optional  gridmap
+map     requisite authzdb
+session requisite authzdb
+</pre>
+</blockquote>
+
+<p>The format of a line in <tt>gplazma.conf</tt> is</p>
+<blockquote>
+<tt>(auth|map|account|session|identity)
+(optional|sufficient|required|requisite) PLUGIN [KEY=VALUE]...</tt>
+</blockquote>
+
+<p>where <em>PLUGIN</em> is the name of a plugin and <em>KEY</em> is
+the name of a configuration property. Plugin configuration is
+integrated with dCache's configuration system. Therefore configuration
+defaults can be found in <tt>/opt/d-cache/share/defaults/</tt> and can
+be redefined in <tt>dcache.conf</tt>, in the layout file, and in
+<tt>gplazma.conf</tt>.</p>
+
+<p>When a user connects to a dCache door, the door sends the login
+information to gPlazma. gPlazma processes the information in four
+steps:</p>
+
+<dl>
+<dt>auth</dt>
+<dd>Authentication processes login credentials and generates
+principals identifying the user. For some protocols (eg. SSL and GSI)
+the actual authentication already happened in the door during the
+protocol handshake. For other protocols (eg. protocols using a user
+name and password, or VOMS which requires a signature verification
+step) the authentication happens during the authentication face in
+gPlazma. The output of the authentication step is a set of
+principals. Examples of typical principals are DN, FQAN, Kerberos
+principal, and user name. These principals are merged with any
+principals the door may have submitted.</dd>
+
+<dt>map</dt>
+<dd>Mapping plugins map principals to other principals. Ultimately we
+have to end up with a UID and at least one GID. Mapping plugins can
+however generate any principal they like and may be chained. Eg. the
+vorolemap plugin maps FQANs to group names while the authzdb plugin
+maps those group names to UID and GID.</dd>
+
+<dt>account</dt>
+<dd>Account plugins check principals against global settings and
+policies. Typically used for global blacklisting lookups or rejecting
+users with illegal or non-authorized principal sets.</dd>
+
+<dt>session</dt>
+<dd>Session plugins associate session attributes with the
+login. Examples of session attributes are the root and home
+directory.</dd>
+</dl>
+
+<p>gPlazma invokes the plugins of each phase in order. Any plugin may
+succeed or fail and the gPlazma configuration specifies how to process
+a success or failure:</p>
+
+<dl>
+<dt>optional</dt>
+<dd>The success or failure of this plugin is only important if it is
+the only plugin in the stack associated with this type.</dd>
+
+<dt>sufficient</dt>
+<dd>Success of such a plugin is enough to satisfy the authentication
+requirements of the stack of plugins (if a prior required plugin has
+failed the success of this one is ignored). A failure of this plugin
+is not deemed as fatal. If the plugin succeeds gPlazma immediately
+proceeds with the next plugin type or returns control to the door if
+this was the last stack.</dd>
+
+<dt>required</dt>
+<dd>Failure of such a plugin will ultimately lead to gPlazma returning
+failure but only after the remaining plugins for this type have been
+invoked.</dd>
+
+<dt>requisite</dt>
+<dd>Like <em>required</em>, however, in the case that such a plugin
+returns a failure, control is directly returned to the door.</dd>
+</dl>
+
+
+<p>Identity plugins are the fith type of plugin and are not used for
+processing login requests. Identity plugins are used by services that
+have to map between external and internal user identities independent
+of whether such mappings would be authorized or not. For instance FTP
+directory listing needs to map UIDs and GIDs used for file ownership
+to user identities that make sense to an external user. Likewise NFS4
+ACL support has to map an external user identity to the corresponding
+UID and GID in order to update the internal ACLs.</p>
+
+<p>A list of available plugins is provided in <a
+href="#gplazma-plugins">the reference section</a>.</p>
+
+
+
+<h2>HTTP and WebDAV</h2>
+
+<p>From Wikipedia: <em>"Web-based Distributed Authoring and
+Versioning, or WebDAV, is a set of extensions to the Hypertext
+Transfer Protocol (HTTP) that allows computer-users to edit and manage
+files collaboratively on remote World Wide Web servers. RFC 4918
+defines the extensions."</em> Wikipedia further notes: <em>"The WebDAV
+protocol allows interactivity, making the Web a readable and writable
+medium, in line with Tim Berners-Lee's original vision. It allows
+users to create, change and move documents on a remote server
+(typically a web server or "web share"). This has obvious uses when
+authoring the documents that a web server serves, but it can also be
+used for storing files on the web, so that the files can be accessed
+from anywhere."</em></p>
+
+<p>WebDAV is supported by all modern operating systems out of the
+box. This includes Windows XP, Windows Vista, Windows 7, Mac OS X, and
+Gnome and KDE shells for Linux and Unixes. Third part clients for iOS
+and Android are available.</p>
+
+<p>The WebDAV door in dCache replaces the HTTP door. To enable the
+WebDAV door add the <tt>webdav</tt> service to the layout. You may
+want to adjust the default parameters for the WebDAV door. Consult
+<tt>/opt/d-cache/share/defaults/webdav.properties</tt> for available
+parameters and documentation on those parameters.</p>
+
+<p>The door supports both unauthenticated HTTP and HTTPS and client
+certificate based authentication over HTTPS. To enable HTTPS, set
+<tt>webdavProtocol=https</tt> or
+<tt>webdavProtocol=https-jglobus</tt>. For the former the host and CA
+certificates need to be imported to be readable by the Java SSL
+libraries. To do this, run the commands <tt>/opt/d-cache/bin/dcache
+import hostcert</tt> and <tt>/opt/d-cache/bin/dcache import
+cacerts</tt>. For the latter host and CA certificates are read from
+<tt>/etc/grid-security/</tt>. The latter option also enables support
+for proxy certificates, including those generated by VOMS.</p>
+
+<p>The HTML rendering of a directory listing is customizable through a
+template file. Please read the document embedded in the default
+template file <tt>/opt/d-cache/share/webdav/templates/list.stg</tt>
+for details on customizing the look and feel.</p>
+
+<p>The WebDAV door can be configured to proxy <em>PUT</em> or
+<em>GET</em> requests through the door. This is useful when pools are
+not accessible by clients or if clients do not support the redirect
+reply. The property <tt>webdav.redirect.on-read</tt> controls whether
+<em>GET</em> requests are redirected to pools or proxied through
+doors. The default is to redirect the client. <em>PUT</em> requests
+are currently always proxied through the door.</p>
+
+<p>RFC 2518 specifies that <em>a PUT performed on an existing resource
+replaces the GET response entity of the resource.</em> That means a
+PUT overwrites existing files. However by default dCache refuse to
+overwrite existing files. The behaviour is controlled by the
+<tt>webdav.overwrite</tt> parameter.</p>
+
+<p>The HTTP mover has been reimplemented and now relies on the Netty
+asynchronous event-driven network application framework. Whereas the
+old mover allocated a TCP port for each transfer, the new mover uses a
+shared TCP port for all HTTP transfers. The mover generates a UUID,
+which is included in the HTTP redirect generated by the door. The new
+mover supports HTTP/1.1 and HTTP keep alive.</p>
+
+<h2>Xrootd</h2>
+
+<p>The interpretation of <tt>xrootdAllowedPaths</tt> has changed. The
+parameter now applies to both reading and writing. The parameters
+<tt>xrootdReadPaths</tt> and <tt>xrootdWritePaths</tt> have been added
+to allow reading and writing to be configured separately.</p>
+
+<p>The interpretation of the empty string for
+<tt>xrootdAllowedPaths</tt> has changed: An empty string used to allow
+writing to all paths. Now it disallows access to any path. To allow
+access to all paths the property has to be set to / (which is the
+default).</p>
+
+<p>The permission check on write has changed. In previous releases the
+parent directory had to have write and execute permissions set for the
+owner of the directory. Starting with dCache 1.9.8 both reads and
+writes are subject to regular authorisation checks. For anonymous
+transfer the authorization happens against the user specified by the
+<tt>xrootdUser</tt> property.  The default is nobody, meaning that
+only world readable/writable files can be read/written. The
+<tt>xrootdUser</tt> property also controls the ownership of files and
+directories created by anonymous clients.</p>
+
+<p>Notice transfers authorized by the TokenAuthorizationFactory
+security plugin are anonymous transfers and are subject to file system
+authorization checks for the user specified by the <tt>xrootdUser</tt>
+property.</p>
+
+<p>The XROOTD protocol has a plugable authentication mechanism. dCache
+1.9.11 added support for GSI authentication. The XROOTD door integrates
+with gPlazma for VOMS authorization and identity mapping. Regular
+XROOTD clients and Root support the GSI authentication mechanism out
+of the box. Notice that the proxy certificate generated by the XROOTD
+client is not supported by dCache: JGlobus rejects the proxy
+certificate because it lacks key usage extensions. A regular proxy
+certificate generated with grid-proxy-init or voms-proxy-init works
+just fine.</p>
+
+<p>Be aware that the XROOTD protocol only uses GSI for purposes of
+authentication. Neither the connection to the door (the xrootd
+redirector) nor the pool (the xrootd dataserver) are encrypted. No
+confidentiality or consistency guarantees are provided and thus
+man-in-the-middle attacks are possible. We recommend restricting
+access to a GSI xrootd door to trusted clients, to particular
+directories, or to restrict write access. This is different from
+GSIDCAP and GridFTP: Although the pool connection in those protocols
+is unauthenticated, the control channel to the door is GSI
+encrypted.</p>
+
+<p>The xrootd door was extended to support the following new xrootd
+requests: <tt>kXR_rm</tt> (file removal), <tt>kXR_rmdir</tt>
+(directory removal), <tt>kXR_mkdir</tt> (directory creation),
+<tt>kXR_mv</tt> (move/rename), <tt>kXR_dirlist</tt> (directory
+listing) and <tt>kXR_prepare</tt>. Support for the option
+<tt>kXR_delete</tt> in the <tt>kXR_open</tt> was added. This option
+allows existing files to be overwritten.</p>
+
+<p>The xrootd mover has been restructured such that it only needs to
+listen to a single TCP port. Previous versions opened a new port for
+each transfer. Since dCache 1.9.10 all xrootd mover instances within a
+single pool domain share a TCP port. For this to work the client must
+present a transfer specific UUID to the pool. The UUID is generated by
+the door when redirecting the client. This all happens within the
+bounds of the existing xrootd protocol and should work with all
+clients.</p>
+
+
+<h2>FTP</h2>
+
+<p>Configuration parameters for controlling FTP proxy behaviour have
+changed. The FTP proxy allows FTP doors to act as proxies, relaying
+data between pools and clients. The proxy behaviour is now controlled
+by the parameters <tt>ftp.proxy.on-active</tt> and
+<tt>ftp.proxy.on-passive</tt>. The parameter
+<tt>gsiftpAllowPassivePool</tt> is no longer supported and is flagged
+as a forbidden parameter preventing dCache from starting. The new
+parameters allow the proxy to be used for both active and passive
+transfers, whereas the old parameter only controlled passive
+transfers. The default behaviour has changed. The proxy now defaults
+to off for both passive and active transfers. Previously it defaulted
+to on for passive and was not used for active transfers.</p>
+
+<p>Authorization for anonymous users in the weak FTP door has changed:
+Anonymous users are now limited to operations with world
+permissions. This behaviour is consistent with other doors allowing
+anonymous access in dCache.</p>
+
+<p>The FTP door has been refactored and shares more code with the
+xrootd, NFS4, and WebDAV doors. One consequence of the refactored code
+is that a number of deadlocks have been fixed. These deadlocks are not
+easy to resolve in stable releases without significant code changes,
+so will not be backported. The deadlocks are triggered by restarting a
+pool at a particular moment during a GridFTP 2 transfer.</p>
+
+
+<h2>DCAP</h2>
+
+<p>The code base of the DCAP door was cleaned up. Error handling,
+robustness and efficiency should be improved. Several inconsistencies
+in how authorization were handled were removed. In particular how
+client overrides for uid, gid, pid and role are handled is
+affected. The role client option was broken for all late 1.8 releases
+and all 1.9 releases up to 1.9.9; those releases interpreted role as
+an FQAN whereas earlier releases interpreted it as a user name. The
+behaviour of 1.7 and early 1.8 releases has been restored.</p>
+
+<p>DCAP supports prestaging from tape. The DCAP door used to rely on a
+stager service to perform the staging.  In dCache 1.9.12 the DCAP door
+instead uses the pin manager to trigger staging. The
+<tt>dummy-prestager</tt> service is obsolete and can be deleted from
+the layout.</p>
+
+<h2>NFS 4.1</h2>
+
+<p>NFS 4.1 support was introduced in dCache 1.9.3. Since then the
+robustness, performance and standard compliance has been significantly
+improved and the NFS 4.1 door is now considered production ready.</p>
+
+<p>The nfsv4 service supports both NFS 4.1 and NFS 3. NFS 3 support
+has to be explicitly enabled by setting <tt>nfs.v3</tt> to
+<tt>true</tt>.</p>
+
+
+<h2>Info provider</h2>
+
+<p>The old info provider has been removed. To publish GLUE one has to
+use the info service and the XSLT based info provider.</p>
+
+<p>The info provider is an XSLT script that transforms the output of
+the info service into GLUE compliant LDIF. The XSLT script used to be
+stored in <tt>/opt/d-cache/etc/glue-1.3.xml</tt> and used to contain
+both the transformation logic and local configuration properties.</p>
+
+<p>In dCache 1.9.12 the info provider has been extended to support
+GLUE 2.0 in addition to GLUE 1.3, and it has been restructured to
+separate configuration properties from the transformation logic.</p>
+
+<p>The old info provider file, <tt>/opt/d-cache/etc/glue-1.3.xml</tt>,
+is obsolete. All site specific configuration is done within the file
+<tt>/opt/d-cache/etc/info-provider.xml</tt>. The configuration
+properties <tt>httpHost</tt>, <tt>xsltProcessor</tt>,
+<tt>xylophoneConfigurationDir</tt>,
+<tt>xylophoneConfigurationFile</tt>, <tt>xylophoneXSLTDir</tt>, and
+<tt>saxonDir</tt> are deprecated and have been replaced by other
+properties. The property <tt>httpPort</tt> is obsolete. The property
+<tt>info-provider.publish</tt> specifies whether to publish GLUE 1.3,
+2.0, or both. See
+<tt>/opt/d-cache/share/defaults/info-provider.properties</tt> for
+details.</p>
+
+<h2>Administration and monitoring</h2>
+
+<h3>Admin shell</h3>
+
+<p>Persistent command history in the admin shell now has to be
+explicitly enabled by defining the <tt>adminHistoryFile</tt>
+property.</p>
+
+<p>The behaviour of the <tt>cd</tt> command in the admin interface has
+changed. Previously, if the command's target cell is not running then
+the <tt>cd</tt> command will succeed; however, subsequent commands
+would fail will a <tt>NoRouteToCellException</tt> error message. The
+new behaviour is that the <tt>cd</tt> command will check that the
+target cell is running. If the cell is running then the <tt>cd</tt>
+command will behave as before; if the cell isn't running then the
+<tt>cd</tt> command will fail and an error message is returned.</p>
+
+<p>The location of the ssh keys used by the admin shell has changed
+from <tt>/opt/d-cache/config/</tt> to <tt>/opt/d-cache/etc/</tt>.</p>
+
+<h3 id="pgv">Pool group view</h3>
+
+<p>The HTTP monitoring interface of dCache contains a pool group
+view. This view contained bugs that prevented pools that were shut
+down, disabled or removed from pool groups from being remove from the
+pool group view. In dCache 1.9.11 the pool group view has been
+reimplemented to solve this problem. The new implementation lacks some
+little used features of the old implementation. Please consult the
+release notes of 1.9.12 for further details.</p>
+
+<h3>Debugging</h3>
+
+<p>Java options have been changed to request a memory dump whenever
+the Java virtual machine suffers from an out of memory condition. By
+default the memory dumps are stored in <tt>/var/log/</tt>, although
+the location can be changed by setting
+<tt>dcache.java.oom.location</tt>.</p>
+
+<p>The init script generates a warning if any memory dumps are
+detected.</p>
+
+<h2>Reference material</h2>
+
+<h3>Upgrade checklist</h3>
+
+<p>Use this checklist to plan the upgrade to 1.9.12. The checklist
+focuses on upgrading a single node and focuses on a manual upgrade.
+Upgrades involving installation scripts like dCacheConfigure, YAIM, or
+site specific deployment scripts are not covered by this process.</p>
+
+<p>Sites that have modified batch files can still use the procedure
+below, however the procedure will be incomplete. We strongly recommend
+against modifying batch files provided by dcache.org; almost all
+settings can be modified in the main configuration file. If a batch
+must be modified we recommend to make a copy of the batch file, giving
+it a new name. This introduces a new service name and avoids that the
+batch file gets overwritten by upgrades. Notice that one has to copy
+service specific (scoped) defaults into the main configuration file
+and rename the scope to match the new service name.</p>
+
+<p>All head nodes, that is, all services besides pools, have to be
+upgraded at the same time. Pools (but not doors) of releases 1.9.5 to
+1.9.12 can be mixed with 1.9.12 head nodes, giving an opportunity to
+perform a staged upgrade.</p>
+
+<ol>
+<li>Execute <tt>/opt/d-cache/bin/dcache stop</tt>.</li>
+
+<li>Make a complete copy of <tt>/opt/d-cache/</tt>, eg. <tt>cp -a
+/opt/d-cache /opt/d-cache-1.9.5</tt>.</li>
+
+<li>Install the 1.9.12 package (RPM, DEB, or PKG).</li>
+
+<li>If this node contains the pool manager, then verify that
+<tt>/opt/d-cache/config/PoolManager.conf</tt> still exists and is
+identical to the backup.</li>
+
+<li>Execute <tt>/opt/d-cache/libexec/migrate-from-1.9.5.sh</tt>.</li>
+
+<li>For each generated warning and error, update
+<tt>/opt/d-cache/etc/dcache.conf</tt> (check the tables below).</li>
+
+<li>Run <tt>/opt/d-cache/bin/dcache check-config</tt> and repeat the
+previous step if necessary.</li>
+
+<li>If this node hosts pools with custom queues, then remove the first
+element of the value of the <tt>poolIoQueue</tt> property in the
+layout file. The pool always instantiates a default queue named
+<tt>regular</tt>.</li>
+
+<li>If this node hosts doors that submit transfers to a custom default
+queue (eg if <tt>gsiftpIoQueue</tt> is defined), then make sure that
+the door configuration is changed to submit to the queue named
+<tt>regular</tt> instead. Alternative remove such declarations as a
+door will submit to the default queue by default.</li>
+
+<li>If this node hosts the SRM, then remove any links or calls to
+<tt>/opt/d-cache/bin/dcache-srm</tt>.</li>
+
+<li>If Chimera is used, then verify that the chimera DB user name in
+<tt>/opt/d-cache/etc/dcache.conf</tt> matches the owner of the Chimera
+DB.</li>
+
+<li>If this node used to start the Chimera NFS 3 daemon using
+<tt>chimera-nfs-run.sh</tt> then
+<ol>
+<li>Remove any links or calls to <tt>chimera-nfs-run.sh</tt>.</li>
+<li>Add the nfsv3 service to the layout file
+<tt>/opt/d-cache/etc/layouts/<em>hostname</em>.conf</tt>:
+<blockquote>
+<pre>
+[nfs-${host.name}Domain]
+[nfs-${host.name}Domain/nfsv3]
+</pre>
+</blockquote>
+</li>
+</ol>
+</li>
+
+<li>Verify the contents <tt>/opt/d-cache/etc/dcache.conf</tt> and the
+layout file. Use the <tt>status</tt>, <tt>services</tt>, <tt>pool
+ls</tt> and <tt>database ls</tt> subcommands of
+<tt>/opt/d-cache/bin/dcache</tt> to verify the setup.</li>
+
+<li>Start dCache by executing <tt>/opt/d-cache/bin/dcache
+start</tt>.</li>
+
+<li>Carefully monitor the log files for any sign of trouble.</li>
+
+<li>If this node publishes GLUE information then
+<ol>
+<li>Configure the info provider by filling in the missing values in
+<tt>/opt/d-cache/etc/info-provider.xml</tt>.</li>
+<li>Ensure that <em>xmllint</em> is installed (the program is provided
+by most OS distributions).</li>
+<li>Execute
+<tt>/opt/d-cache/libexec/infoProvider/info-based-infoProvider.sh</tt>
+and verify that the output is as expected. In particular you should
+verify that the string UNDEFINED does not appear in any values.</li>
+<li>Update the BDII configuration to use this script to generate the
+GLUE LDIF.</li>
+</ol>
+</li>
+</ol>
+
+<h3>Terminology</h3>
+
+<table class="sortable">
+<thead>
+<tr>
+<th style="width: 7em">Term</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cell</td>
+<td>A component of dCache. dCache consists of many cells. A cell must
+have a name which is unique within the domain hosting the cell.</td>
+</tr>
+<tr>
+<td>domain</td>
+<td>A container hosting one or more dCache cells. A domain runs within
+its own process. A domain must have a name which is unique throughout
+the dCache instance.</td>
+</tr>
+<tr>
+<td>service</td>
+<td>An abstraction used in dCache configuration files to describe
+atomic units to add to a domain. A service is typically implemented
+through one or more cells.</td>
+</tr>
+<tr>
+<td>layout</td>
+<td>Definition of domains and services on a given host. The layout is
+specified in the layout file. The layout file may contain both domain-
+and service- specific configuration values.</td>
+</tr>
+<tr>
+<td>pool</td>
+<td>A service providing physical data storage.</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Services</h3>
+
+<p>This section lists all supported services.  Those marked with a
+* are services that dCache requires to function
+correctly.</p>
+
+<table class="sortable">
+<caption>Core services</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Decscription</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>broadcast<sup>&lowast;</sup></td>
+<td>Internal message broadcast service.</td>
+</tr>
+<tr>
+<td>cleaner<sup>&lowast;</sup></td>
+<td>Service to remove files from pools and tapes when the name space
+entry is deleted.</td>
+</tr>
+<tr>
+<td>pnfsmanager<sup>&lowast;</sup></td>
+<td>Gateway to name space (either PNFS or Chimera).</td>
+</tr>
+<tr>
+<td>pool<sup>&lowast;</sup></td>
+<td>Provides physical data storage.</td>
+</tr>
+<tr>
+<td>poolmanager<sup>&lowast;</sup></td>
+<td>Central registry of all pools. Routes transfers to pools, triggers
+staging from tape, performs hot spot detection.</td>
+</tr>
+<tr>
+<td>dir</td>
+<td>Directory listing support for DCAP.</td>
+</tr>
+<tr>
+<td>gplazma</td>
+<td>Authorization cell</td>
+</tr>
+<tr>
+<td>loginbroker</td>
+<td>Central registry of all doors. Provides data to SRM for load
+balancing.</td>
+</tr>
+<tr>
+<td>srm-loginbroker</td>
+<td>Central registry of all SRM doors.</td>
+</tr>
+<tr>
+<td>pinmanager</td>
+<td>Pinning and staging support for SRM and DCAP.</td>
+</tr>
+<tr>
+<td>replica</td>
+<td>Manages file replication for <em>Resilient dCache</em>.</td>
+</tr>
+<tr>
+<td>spacemanager</td>
+<td>Space reservation support for SRM.</td>
+</tr>
+</tbody>
+</table>
+
+<table class="sortable">
+<caption>Admin and monitoring services</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Decscription</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>acl</td>
+<td>Administrative interface for ACLs.</td>
+</tr>
+<tr>
+<td>admin</td>
+<td>SSH based admin shell.</td>
+</tr>
+<tr>
+<td>billing<sup>&lowast;</sup></td>
+<td>Service for logging to billing files or the billing database.</td>
+</tr>
+<tr>
+<td>httpd</td>
+<td>Monitoring portal. <em>Depends on: loginbroker,
+topo</em>.</td>
+</tr>
+<tr>
+<td>info</td>
+<td>Info service that collects information about the dCache
+instance. <em>Recommends: httpd</em></td>
+</tr>
+<tr>
+<td>statistics</td>
+<td>Collects usage statistics from all pools and generates reports in
+HTML.</td>
+</tr>
+<tr>
+<td>topo</td>
+<td>Builds a topology map of all domains and cells in the dCache
+instance.</td>
+</tr>
+<tr>
+<td>webadmin</td>
+<td>Next generation web admin portal. <em>Depends on:
+info</em></td>
+</tr>
+</tbody>
+</table>
+
+<table class="sortable">
+<caption>Doors</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Decscription</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>authdcap</td>
+<td>Authenticated DCAP door. <em>Depends on: dir. Recommends:
+pinmanager</em>.</td>
+</tr>
+<tr>
+<td>dcap</td>
+<td>dCap door. <em>Depends on: dir. Recommends:
+pinmanager</em>.</td>
+</tr>
+<tr>
+<td>gsidcap</td>
+<td>GSI dCap door. <em>Depends on: dir. Recommends:
+pinmanager</em>.</td>
+</tr>
+<tr>
+<td>kerberosdcap</td>
+<td>Kerberized dCap door. <em>Depends on: dir. Recommends:
+pinmanager</em>.</td>
+</tr>
+<tr>
+<td>ftp</td>
+<td>Regular FTP door without strong authentication.</td>
+</tr>
+<tr>
+<td>gridftp</td>
+<td>GridFTP door.</td>
+</tr>
+<tr>
+<td>kerberosftp</td>
+<td>Kerberized FTP door.</td>
+</tr>
+<tr>
+<td>nfsv3</td>
+<td>NFS 3 name space export (only works with Chimera).</td>
+</tr>
+<tr>
+<td>nfsv41</td>
+<td>NFS 4.1 door (only works with Chimera).</td>
+</tr>
+<tr>
+<td>srm</td>
+<td>SRM door. <em>Depends on: pinmanager,
+loginbroker, srm-loginbroker. Recommends:
+transfermanagers, spacemanager</em>.</td>
+</tr>
+<tr>
+<td>transfermanagers</td>
+<td>Server side srmCopy support for SRM.</td>
+</tr>
+<tr>
+<td>webdav</td>
+<td>HTTP and WebDAV door.</td>
+</tr>
+<tr>
+<td>xrootd</td>
+<td>XROOT door.</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="gplazma-plugins">gPlazma 2 plugins</h3>
+
+<p>The following gPlazma 2 plugins are shipped with dCache and can be
+used in <tt>gplazma.conf</tt>. Note that several plugins implement
+more than one type. Usually such plugins should be added to all phases
+supported by the plugin.</p>
+
+<table class="sortable">
+<caption>gPlazma 2 plugins</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x509</td>
+<td>auth</td>
+<td>Extracts the DN from an X.509 certificate. The certificate chain
+is not validated (it is assumed that the door already validated the
+chain). The plugin fails if no certificate chain is provided.</td>
+</tr>
+<tr>
+<td>voms</td>
+<td>auth</td>
+<td>Validates any VOMS attributes in an X.509 certificate and extracts
+all valid FQANs. Requires that a vomsdir is configured. Fails if no
+valid FQAN is found.</td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>auth</td>
+<td>Verifies username and password credentials using the kpwd
+file. Fails if no username or password is provided, if the username is
+not defined in the kpwd file, if the password is invalid, or if the
+entry has been disabled in the kpwd file.</td>
+</tr>
+<tr>
+<td>gridmap</td>
+<td>map</td>
+<td>Maps DN principals to user name principals according to a
+grid-mapfile. Fails if no DN was provided or no mapping is found.</td>
+</tr>
+<tr>
+<td>vorolemap</td>
+<td>map</td>
+<td>Maps FQAN principals to group name principals according to a
+grid-vorolemap file. Each FQAN is mapped to the first entry that is a
+prefix of the FQAN. The primary FQAN (the first in the certificate) is
+mapped to the primary group name. Fails if no FQAN was provided or no
+mapping was found.</td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>map</td>
+<td>Maps user names, DNs and Kerberos principals according to the kpwd
+file. Only user names verified by the kpwd auth plugin are
+mapped. Fails if nothing was mapped or if the kpwd entry has been
+disabled. Maps to user name, UID and GID principals.
+</td>
+</tr>
+<tr>
+<td>authzdb</td>
+<td>map</td>
+<td>Maps user and group name principals to UID and GID principals
+according to a storage authzdb file. The file format does not
+distinguish between user names and group names and hence each entry in
+the file maps to both a UID and one or more GIDs.  Therefore the UID
+and the primary GID are determined by the mapping for the primary
+group name or user name. The name of that mapping is kept as the user
+name of the login and may be used for a session plugin or for
+authorization in space manager. Remaining GIDs are collected from
+other mappings of available group names.</td>
+</tr>
+<tr>
+<td>argus</td>
+<td>account</td>
+<td></td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>account</td>
+<td>Fails if the kpwd entry used during the map has been
+disabled.</td>
+</tr>
+<tr>
+<td>authzdb</td>
+<td>session</td>
+<td>Associates a user name with root and home directory and read-only
+status according to a storage authzdb file.</td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>session</td>
+<td>Adds home and root directories and read-only status to the
+session. Only applies to mappings generated by the kpwd map
+plugin.</td>
+</tr>
+</tbody>
+</table>
+
+<p>Please consult
+<tt>/opt/d-cache/share/defaults/gplazma.properties</tt> for details
+about available configuration properties.</p>
+
+<h3>Changed properties</h3>
+
+<p>Most of the service specific configuration parameters known from
+the old <tt>/opt/d-cache/config/dCacheSetup</tt> file can still be
+defined in <tt>/opt/d-cache/etc/dcache.conf</tt>. Some have however
+been removed or replaced and others have been added. The following
+tables provide an overview of the properties that may need to be
+changed when upgrading from dCache 1.9.5 to 1.9.12.</p>
+
+<table class="sortable">
+<caption>Deprecated properties</caption>
+<thead>
+<tr>
+<th>Property</th>
+<th>Alternative</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user</td>
+<td>dcache.user</td>
+<td>Defines the user account to run dCache under.</td>
+</tr>
+<tr>
+<td>pidDir</td>
+<td>dcache.pid.dir</td>
+<td>The directory containing PID files.</td>
+</tr>
+<tr>
+<td>logArea</td>
+<td>dcache.log.dir</td>
+<td>The directory containing log files.</td>
+</tr>
+<tr>
+<td>logMode</td>
+<td>dcache.log.mode</td>
+<td>Whether to rename log files on every restart.</td>
+</tr>
+<tr>
+<td>classpath</td>
+<td>dcache.java.classpath</td>
+<td>Classpath for add-on JARs</td>
+</tr>
+<tr>
+<td>ourHomeDir</td>
+<td>dcache.home</td>
+<td>Automatically set to value of DCACHE_HOME environment variable</td>
+</tr>
+<tr>
+<td>librarypath</td>
+<td>dcache.paths.lib</td>
+<td>Load path for add-on shared libraries</td>
+</tr>
+<tr>
+<td>config</td>
+<td>dcache.paths.config</td>
+<td>Location of dCache's config directory</td>
+</tr>
+<tr>
+<td>classesDir</td>
+<td>dcache.paths.classes</td>
+<td>Location of dCache's classes directory</td>
+</tr>
+<tr>
+<td>keyBase</td>
+<td>dcache.paths.ssh-keys</td>
+<td>Location of ssh keys for admin door</td>
+</tr>
+<tr>
+<td>messageBroker</td>
+<td>broker.scheme</td>
+<td>Message broker implementation</td>
+</tr>
+<tr>
+<td>serviceLocatorHost</td>
+<td>broker.host</td>
+<td>Message broker host name</td>
+</tr>
+<tr>
+<td>serviceLocatorPort</td>
+<td>broker.port</td>
+<td>Message broker TCP port</td>
+</tr>
+<tr>
+<td>amqHost</td>
+<td>broker.amq.host</td>
+<td>Active MQ broker host</td>
+</tr>
+<tr>
+<td>amqPort</td>
+<td>broker.amq.port</td>
+<td>Active MQ broker TCP port</td>
+</tr>
+<tr>
+<td>amqUrl</td>
+<td>broker.amq.url</td>
+<td>Active MQ connection URL</td>
+</tr>
+<tr>
+<td>portBase</td>
+<td></td>
+<td>Use the per door setings</td>
+</tr>
+<tr>
+<td>aclConnDriver</td>
+<td>chimera.db.driver</td>
+<td>DB driver for ACL access</td>
+</tr>
+<tr>
+<td>aclConnUser</td>
+<td>chimera.db.user</td>
+<td>DB user name for ACL access</td>
+</tr>
+<tr>
+<td>aclConnPswd</td>
+<td>chimera.db.password</td>
+<td>DB password for ACL access</td>
+</tr>
+<tr>
+<td>cleanerArchive</td>
+<td>cleaner.archive</td>
+<td>Cleaner archive mode</td>
+</tr>
+<tr>
+<td>cleanerDB</td>
+<td>cleaner.book-keeping.dir</td>
+<td>Cleaner book keeping directory</td>
+</tr>
+<tr>
+<td>cleanerPoolTimeout</td>
+<td>cleaner.pool-reply-timeout</td>
+<td>Cleaner pool timeout</td>
+</tr>
+<tr>
+<td>cleanerProcessFilePerRun</td>
+<td>cleaner.max-files-in-message</td>
+<td>Cleaner message size</td>
+</tr>
+<tr>
+<td>cleanerRecover</td>
+<td>cleaner.pool-retry</td>
+<td>Cleaner pool retry time</td>
+</tr>
+<tr>
+<td>cleanerRefresh</td>
+<td>cleaner.period</td>
+<td>Cleaner frequency</td>
+</tr>
+<tr>
+<td>hsmCleaner</td>
+<td>cleaner.hsm</td>
+<td>Cleaner support for HSM</td>
+</tr>
+<tr>
+<td>hsmCleanerFlush</td>
+<td>cleaner.hsm.flush.period</td>
+<td>Cleaner failure flush frequency</td>
+</tr>
+<tr>
+<td>hsmCleanerRecover</td>
+<td>cleaner.pool-retry</td>
+<td>Cleaner pool retry time</td>
+</tr>
+<tr>
+<td>hsmCleanerRepository</td>
+<td>cleaner.hsm.repository.dir</td>
+<td>Cleaner HSM failure directory</td>
+</tr>
+<tr>
+<td>hsmCleanerRequest</td>
+<td>cleaner.hsm.max-file-in-message</td>
+<td>Cleaner HSM message size</td>
+</tr>
+<tr>
+<td>hsmCleanerScan</td>
+<td>cleaner.period</td>
+<td>Cleaner frequency</td>
+</tr>
+<tr>
+<td>hsmCleanerTimeout</td>
+<td>cleaner.hsm.pool-reply-timeout</td>
+<td>Cleaner pool timeout</td>
+</tr>
+<tr>
+<td>hsmCleanerTrash</td>
+<td>cleaner.hsm.trash.dir</td>
+<td>Cleaner HSM trash directory</td>
+</tr>
+<tr>
+<td>hsmCleanerQueue</td>
+<td>cleaner.hsm.max-current-requests</td>
+<td>Cleaner HSM request limit</td>
+</tr>
+<tr>
+<td>trash</td>
+<td>cleaner.trash.dir</td>
+<td>Cleaner trash directory</td>
+</tr>
+<tr>
+<td>gsiftpDefaultStreamsPerClient</td>
+<td></td>
+<td>Breaks protocol compliance</td>
+</tr>
+<tr>
+<td>httpHost</td>
+<td>info-provider.http.host</td>
+<td>Host running the httpd service</td>
+</tr>
+<tr>
+<td>xsltProcessor</td>
+<td>info-provider.processor</td>
+<td>XSLT implementation to use</td>
+</tr>
+<tr>
+<td>xylophoneConfigurationDir</td>
+<td colspan="2">info-provider.configuration.dir</td>
+</tr>
+<tr>
+<td>xylophoneConfigurationFile</td>
+<td colspan="2">info-provider.configuration.file</td>
+</tr>
+<tr>
+<td>xylophoneXSLTDir</td>
+<td colspan="2">info-provider.xylophone.dir</td>
+</tr>
+<tr>
+<td>saxonDir</td>
+<td colspan="2">info-provider.saxon.dir</td>
+</tr>
+<tr>
+<td>SpaceManagerDefaultAccessLatency</td>
+<td colspan="2">DefaulAccessLatencyForSpaceReservation</td>
+</tr>
+<tr>
+<td>srmDbHost</td>
+<td>srmDatabaseHost</td>
+<td>Host providing the SRM database</td>
+</tr>
+<tr>
+<td>srmPnfsManager</td>
+<td>pnfsmanager</td>
+<td>Cell name of PNFS manager</td>
+</tr>
+<tr>
+<td>srmPoolManager</td>
+<td>poolmanager</td>
+<td>Cell name of pool manager</td>
+</tr>
+<tr>
+<td>srmNumberOfDaysInDatabaseHistory</td>
+<td>srmKeepRequestHistoryPeriod</td>
+<td>Days before old transfers are removed</td>
+</tr>
+<tr>
+<td>srmOldRequestRemovalPeriodSeconds</td>
+<td>srmExpiredRequestRemovalPeriod</td>
+<td>Seconds between removing old transfers</td>
+</tr>
+<tr>
+<td>srmJdbcMonitoringLogEnabled</td>
+<td>srmRequestHistoryDatabaseEnabled</td>
+<td>Enables SRM request transition history</td>
+</tr>
+<tr>
+<td>srmJdbcSaveCompletedRequestsOnly</td>
+<td>srmStoreCompletedRequestsOnly</td>
+</tr>
+<tr>
+<td>srmJdbcEnabled</td>
+<td>srmDatabaseEnabled</td>
+</tr>
+<tr>
+<td>httpPortNumber</td>
+<td>webdavPort</td>
+<td>WebDAV TCP port</td>
+</tr>
+<tr>
+<td>httpRootPath</td>
+<td>webdavRootPath</td>
+<td>WebDAV name space root</td>
+</tr>
+<tr>
+<td>httpAllowedPaths</td>
+<td>webdavAllowedPaths</td>
+<td>WebDAV path based authorization</td>
+</tr>
+<tr>
+<td>kerberosRealm</td>
+<td colspan="2">kerberos.realm</td>
+</tr>
+<tr>
+<td>kerberosKdcList</td>
+<td colspan="2">kerberos.key-distribution-center-list</td>
+</tr>
+<tr>
+<td>authLoginConfig</td>
+<td colspan="2">kerberos.jaas.config</td>
+</tr>
+<tr>
+<td>kerberosScvPrincipal</td>
+<td colspan="2">kerberos.service-principle-name</td>
+</tr>
+<tr>
+<td>images</td>
+<td>httpd.static-content.images</td>
+<td>Location of images for httpd service</td>
+</tr>
+<tr>
+<td>styles</td>
+<td>httpd.static-content.styles</td>
+<td>Location of style sheets for httpd service</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+<table class="sortable">
+<caption>New properties</caption>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dcache.namespace</td>
+<td>Whether to use Chimera or PNFS. Replaces the namespace Parameter of etc/node_config.</td>
+</tr>
+<tr>
+<td>dcache.layout</td>
+<td>The layout to use; The layout filename is derived from this value.</td>
+</tr>
+<tr>
+<td>pnfsVerifyAllLookups</td>
+<td>verify lookup permissions of the entire path (starting with 1.9.12-22)</td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="sortable">
+<caption>Obsolete properties</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>useFileSystem</td>
+<td>No longer relevant</td>
+</tr>
+<tr>
+<td>srmVacuum</td>
+<td>Use PostgreSQL auto vacuuming instead</td>
+</tr>
+<tr>
+<td>srmVacuumPeriod</td>
+<td>Use PostgreSQL auto vacuuming instead</td>
+</tr>
+<tr>
+<td>bufferSize</td>
+<td>Had no effect</td>
+</tr>
+<tr>
+<td>tcpBufferSize</td>
+<td>Had no effect</td>
+</tr>
+<tr>
+<td>maintenanceLibPath</td>
+<td>Module has been removed</td>
+</tr>
+<tr>
+<td>maintananceLibAutogeneraetPaths</td>
+<td>Module has been removed</td>
+</tr>
+<tr>
+<td>maintenanceLogoutTime</td>
+<td>Module has been removed</td>
+</tr>
+<tr>
+<td>srmVersion</td>
+<td>No longer relevant</td>
+</tr>
+<tr>
+<td>permissionHandler</td>
+<td>No longer relevant</td>
+</tr>
+<tr>
+<td>PermissionHandlerDataSource</td>
+<td>No longer relevant</td>
+</tr>
+<tr>
+<td>gsiftpPoolProxy</td>
+<td>Determined automatically</td>
+</tr>
+<tr>
+<td>ftpBase</td>
+<td>Derived from gPlazma values</td>
+</tr>
+<tr>
+<td>spaceReservation</td>
+<td>Legacy space manager was removed</td>
+</tr>
+<tr>
+<td>spaceReservationStrict</td>
+<td>Legacy space manager was removed</td>
+</tr>
+<tr>
+<td>gPlazmaRequestTimeout</td>
+<td>Timeout is now controlled by the door</td>
+</tr>
+<tr>
+<td>delegateToGPlazma</td>
+<td>Functionality was removed</td>
+</tr>
+<tr>
+<td>httpPort</td>
+<td>Use httpdPort instead</td>
+</tr>
+<tr>
+<td>httpdEnablePoolCollector</td>
+<td>Functionality is now always enabled</td>
+</tr>
+<tr>
+<td>srmAsynchronousLs</td>
+<td>Use srmLsRequestSwitchToAsynchronousModeDelay</td>
+</tr>
+<tr>
+<td>nostrongauthorization</td>
+<td>Functionality was removed</td>
+</tr>
+<tr>
+<td>removeUnexistingEntriesOnFlush</td>
+<td>The logic was improved and orphaned files will automatically be
+removed if the file system entry no longer exist</td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Forbidden properties</caption>
+<thead>
+<tr>
+<th>Property</th>
+<th>Alternative</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>java</td>
+<td></td>
+<td>Define JAVA_HOME in /etc/dcache.env or /etc/default/dcache</td>
+</tr>
+<tr>
+<td rowspan="11">java_options</td>
+<td>dcache.java.memory.heap</td>
+<td>The Java heap size, For instance, 512m.</td>
+</tr>
+<tr>
+<td>dcache.java.memory.direct</td>
+<td>The Java maximum direct buffer size, For instance, 128m.</td>
+</tr>
+<tr>
+<td>net.wan.port.min</td>
+<td>Lower bound on TCP port range for WAN protocols.</td>
+</tr>
+<tr>
+<td>net.wan.port.max</td>
+<td>Upper bound on TCP port range for WAN protocols.</td>
+</tr>
+<tr>
+<td>net.lan.port.min</td>
+<td>Lower bound on TCP port range for LAN protocols.</td>
+</tr>
+<tr>
+<td>net.lan.port.max</td>
+<td>Upper bound on TCP port range for LAN protocols.</td>
+</tr>
+<tr>
+<td>net.inetaddr.lifetime</td>
+<td>DNS cache time</td>
+</tr>
+<tr>
+<td>pool.dcap.port</td>
+<td>TCP port for DCAP mover</td>
+</tr>
+<tr>
+<td>gsi.delegation.cache.lifetime</td>
+<td>GSI delegation cache time</td>
+</tr>
+<tr>
+<td>gsi.crl.cache.lifetime</td>
+<td>CRL cache time</td>
+</tr>
+<tr>
+<td>dcache.java.options.extra</td>
+<td>Additional options to provide to the Java VM</td>
+</tr>
+<tr>
+<td>gsiftpAllowPassivePool</td>
+<td>ftp.proxy.on-passive</td>
+<td>Whether to proxy passive transfers.</td>
+</tr>
+<tr>
+<td>waitForRepositoryReady</td>
+<td>waitForFiles</td>
+<td>Delay startup until file system was mounted</td>
+</tr>
+</tbody>
+</table>
+
+
+</body>
+</html>
+

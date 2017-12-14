@@ -1,0 +1,1483 @@
+---
+layout: default
+---
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>2.6 Upgrade Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" media="screen">
+    <link type="text/css" rel="stylesheet" href="jquery.tocify.css" />
+    <style>
+      body {
+         padding-top: 20px;
+      }
+      @media (max-width: 767px) {
+        #toc {
+          position: relative;
+          width: 100%;
+          margin: 0px 0px 20px 0px;
+        }
+      }
+      @media print {
+        #toc {
+          display: none;
+        }
+      }
+      code.service.optional {
+        border: dotted;
+        border-width: 1px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div id="toc" class="hidden-print">
+          </div>
+        </div>
+
+        <div class="span9">
+
+<div class="page-header">
+<h1>The ultimate golden release upgrade guide</br>
+<small>How to get from dCache 2.2 to dCache 2.6</small></h1>
+<address>
+<strong>Author</strong></br>
+Gerd Behrmann  &lt;behrmann@nordu.net&gt;
+</address>
+</div>
+
+<h2>General changes</h2>
+
+<h3>License change</h3>
+
+<p>dCache has moved from a proprietary shared source license to the
+AGPL 3 free and open source license. The <a
+href="https://github.com/dCache/xrootd4j">xrootd</a>, <a
+href="https://github.com/dCache/jpnfs">NFS</a> and <a
+href="https://github.com/dCache/oncrpc4j">RPC</a> code has been moved
+out of dCache and into self-contained projects released under the LGPL
+3.</p>
+
+<h3>Source code repository</h3>
+
+<p>The main source code repository has been migrated from a private
+SVN server to GitHub. The source can be found at <a
+href="https://github.com/dCache/dcache">https://github.com/dCache/dcache</a>. Third
+parties are welcome to fork the repository and submit pull requests
+with contributions. Note that the copyright of all contributions must
+be transferred to DESY.</p>
+
+<h2>Transfer protocols</h2>
+
+<h3>NFS</h3>
+
+<p>The NFS 4.1 service now supports sending all pool interfaces to the NFS
+client.  This allows the NFS client to choose the most appropriate
+interface, including whether to use IPv4 or IPv6.
+
+<p>The location and name of the NFS exports file is now configurable using the 
+<code class="property">nfs.export.file</code> configuration property.
+
+<p>Several performance related improvements have been made.</p>
+
+<p>A new dot command for querying the locality of a file, ie whether the file is currently
+online, nearline, or unavailable. The command follows the format <code class="filename">.(get)(<em>filepath</em>)(locality)</code>.
+This information has previously been available through SRM.</p>
+
+<p>The NFS 4.1 door's <code class="admin">exports ls</code> command now accepts an argument that allows
+the list of exports to be limited to those of a particular host.</p>
+
+<p>Since NFS doors are unable to map available pools to how much
+logical space is available to the end user, the total size of the file
+system exported by the NFS door is hardcoded to a large fixed
+value. This value has been increased from 10 petabyte to 1
+exabyte. This is to ensure that the reported size is bigger than the
+reported used space.</p>
+
+<p>NFS 4.1 doors cache gPlazma lookups for improved performance. Admin
+shell commands for inspecting and clearing the cache have been
+added. Use <code class="admin">login clear cache</code> to clear the cache and <code class="admin">login
+dump cache</code> to inspect the content of the cache.</p>
+
+<p>Commits: <a href="https://github.com/dCache/dcache/commit/53a08ce3465770fa6029897fb522ba070cd02c9c">53a08ce</a>,
+<a href="https://github.com/dCache/dcache/commit/e59531a70bf92d20d99fad8273993c77bc5814c9">e59531a</a>,
+<a href="https://github.com/dCache/dcache/commit/4602f17b23c028440386050da45d138bfce828b2">4602f17</a>,
+<a href="https://github.com/dCache/dcache/commit/c59e7b76919f82ebee0dbe1838bb2031c112ce64">c59e7b7</a>,
+<a href="https://github.com/dCache/dcache/commit/82d3bc5d2f6dafb33e681f153f84f86e0b776b8a">82d3bc5</a>,
+<a href="https://github.com/dCache/dcache/commit/9007c100cdaf46512332d1bf3cb591ec336a2449">9007c10</a>,
+<a href="https://github.com/dCache/dcache/commit/f1d2e5c96b6350b0c229436787fca0b113d5cbf3">f1d2e5c</a>,
+<a href="https://github.com/dCache/dcache/commit/c957736e883995d99919f19e8ed1c69df3c4c68b">c957736</a>.</p>
+
+
+<h3>DCAP</h3>
+
+<p>DCAP per session cells are no longer exported as well-known cells. This means that to 
+talk to the cell through the admin shell, one has to <code class="admin">cd</code> to the fully qualified
+cell name including the <tt>@<em>domain</em></tt> suffix. Only the cells created for each
+client connection are affected by this change. By not exporting the cell name of these
+relatively short lived cells, the routing overhead in the cells messaging system is 
+reduced.</p>
+
+<p>The DCAP no longer disables a pool when a client tries to write to a file opened for reading.</p>
+
+<p>DCAP doors now detect if its thread for accepting client connection has died, and will
+stop publishing to the login broker.</p>
+
+<p>DCAP doors now only log protocol violations and unclean client disconnects at debug level. This is 
+to prevent that automated port scans fill up the log files.</p>
+
+<p>Minor performance improvements for gsidcap have been implemented.</p>
+
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/bb098d644846c606b759cf48c2aa000f00117edb">bb098d6</a>,
+<a href="https://github.com/dCache/dcache/commit/eb03cef5ae7a52c580ab67a87c320b791a5a70c3">eb03cef</a>,
+<a href="https://github.com/dCache/dcache/commit/f6df217b15e9aa62ba7bcd4a57934657063c5f4d">f6df217</a>,
+<a href="https://github.com/dCache/dcache/commit/de2ee90b00e3d872743fc9473730ff8f4913182a">de2ee90</a>,
+<a href="https://github.com/dCache/dcache/commit/09cbbd7cd709d2c9ac23acb70ec45ff5a96a7e0c">09cbbd7</a>,
+<a href="https://github.com/dCache/dcache/commit/d0bb77187bbfa6d13c53392efbd1f7e92f8806c9">d0bb771</a>.</p>
+
+
+<h3>WebDAV</h3>
+
+<p>Pools now include the Content-Location header it replies to GET requests. This header
+allows dCache to associate the resource with the URI pointing to the WebDAV door.</p>
+
+<p>The WebDAV door is now able to redirect PUT requests to a pool, thus avoiding
+proxying the data through the WebDAV door. This functionality has previously been
+available for GET requests. Note that many clients do not support redirects on PUT.
+The functionality can be disabled by setting <code class="property">webdav.redirect.on-write</code> to false,
+analogous to disabling redirect on GET by setting <code class="property">webdav.redirect.on-read</code> to
+false.</p>
+
+<p>chroot</p>
+
+<p>Resource handling of the HTTP mover running on pools has been changed. The mover
+no longer allocates a thread per connection, and the thread pools used for network and
+disk I/O are now allocated per pool rather than per domain. Ie several pools running 
+in the same domain now each allocate their own thread pools for HTTP transfers. This
+affects the interpretation of the <code class="property">httpMover<em>XXX</em></code> family of configuration
+properties.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/8ba35d96d8b4e368dbb3115f2d9f2b617306ad27">8ba35d9</a>,
+<a href="https://github.com/dCache/dcache/commit/b7bc58de4855608017e49d9759f8d17ee8d136b4">b7bc58d</a>,
+<a href="https://github.com/dCache/dcache/commit/b460302934a6dab2cde1202a38883552d62ac65d">b460302</a>,
+<a href="https://github.com/dCache/dcache/commit/dd1031ba90d848adcaecfb604ea51539dbebe878">dd1031b</a>.</p>
+
+<h3>Xrootd</h3>
+
+<p>A notable change, albeit invisible to users and end users, is
+that the majority of the xrootd code has moved to its own project,
+called xrootd4j. We hope the code will be useful to other
+projects.</p>
+
+<p>The xrootd stack in both the xrootd doors and the xrootd mover
+running on pools has been extended with a new plugin type. These
+plugin have full access to introspect, intercept and alter the
+communiation between the xrootd client and dCache. Previous versions
+of dCache supported authentication and authorization plugins for
+doors. These are still supported, although they have been refactored
+as special cases of the newer and more powerful plugin system. The
+properties <code class="property">xrootdAuthNPlugin</code> and <code class="property">xrootdAuthzPlugin</code>
+have been deprecated in favor of the <code class="property">xrootdPlugins</code>
+property. Note that the new property must be defined separately for
+doors and pools.</p>
+
+<p>Resource handling of the xrootd mover running on pools has been
+changed. The mover no longer allocates a thread per connection, and
+the thread pools used for network and disk I/O are now allocated per
+pool rather than per domain. Ie several pools running in the same
+domain now each allocate their own thread pools for xrootd
+transfers. This affects the interpretation of
+the <code class="property">xrootdMover<em>XXX</em></code> family of configuration
+properties.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/97b0ecb8b5b920fa4e98235ae6a80195bcec9e1c">97b0ecb</a>,
+<a href="https://github.com/dCache/dcache/commit/c2cc07567f5348d035b829ba159f0ec3884ad991">c2cc075</a>,
+<a href="https://github.com/dCache/dcache/commit/5a4c6a9bab8b9d578bd344cebb45e7c0d40c9041">5a4c6a9</a>,
+<a href="https://github.com/dCache/dcache/commit/e66a2e4fde22da29c0e204d7aaa7f4af9658b25d">e66a2e4</a>,
+<a href="https://github.com/dCache/dcache/commit/4acadb68fc65c2b51c094aa2c66230c3037b9d24">4acadb6</a>,
+<a href="https://github.com/dCache/dcache/commit/dd1031ba90d848adcaecfb604ea51539dbebe878">dd1031b</a>.</p>
+
+
+<h3>FTP</h3>
+
+<p>The clear text FTP service now works with space manager, although it is limited to the use
+of default space tokens bound to a directory through directory tags.</p>
+
+<p>FTP per session cells are no longer exported as well-known cells. This means that to 
+talk to the cell through the admin shell, one has to <code class="admin">cd</code> to the fully qualified
+cell name including the <tt>@<em>domain</em></tt> suffix. Only the cells created for each
+client connection are affected by this change. By not exporting the cell name of these
+relatively short lived cells, the routing overhead in the cells messaging system is 
+reduced.</p>
+
+<p>FTP doors now detect if the thread for accepting client connection
+has died, and will stop publishing to the login broker.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/0c0bdbfa4511d81be22f656e6ae8eaf89bf8a4fd">0c0bdbf</a>,
+<a href="https://github.com/dCache/dcache/commit/09cbbd7cd709d2c9ac23acb70ec45ff5a96a7e0c">09cbbd7</a>,
+<a href="https://github.com/dCache/dcache/commit/d0bb77187bbfa6d13c53392efbd1f7e92f8806c9">d0bb771</a>.</p>
+
+<h2>Name space</h2>
+
+<h3>PNFS</h3>
+
+<p>PNFS is no longer supported by dCache. The use of Chimera is mandatory in dCache 2.6.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/41ca6c290700d9bf7df68633f0ce4b2f95b8f24f">41ca6c2</a>.</p>
+
+<h3>Chimera</h3>
+
+<p>The Chimera database schema is now managed automatically by dCache. This means that on
+first installation, only an empty database needs to be created and the pnfsmanager service
+will automatically populate the database with tables, indexes, triggers, etc. On upgrade, 
+the schema will be automatically updated with the latest changes. The automatic update can
+be disabled by setting the <code class="property">db.schema.auto</code> to false. In that case the schema update
+has to be applied manually by using the <code>dcache database update</code> command. The SQL
+script for creating the Chimera schema shipped with previous versions of dCache are no
+longer included.</p>
+
+<div class="alert alert-block">
+<p class="label label-warning">Warning</p>
+<p>On first startup after upgrade to
+dCache 2.6 from dCache 2.2, the schema update may take quite a while
+(hours) on large instances. In some cases upgrading to PostgreSQL 9.2
+prior to the dCache upgrade will speed up the schema update.</p></div>
+
+
+<p>There has been work on supporting embedded databases with Chimera. At the moment 
+H2 and HSQLDB are supported, although the cleaner currently works with neither of them.
+At the time of writing, use cases are limited to test and demo deployments.</p>
+
+<p>Added support for converting Enstore data stored in level 4 during
+migration from PNFS to Chimera.</p>
+
+<p>Performance of file deletion has been improved by using cascading deletes in the
+database schema.</p>
+
+<p>Chimera is now able to track the last access time of a file. The access time is updated
+whenever a pool reads a file. To reduce the performance overhead for files accessed 
+frequently, the precision of the access time can be reduced in pnfsmanager by setting
+the <code class="property">atime.gap</code> property.</p>
+
+
+<p>Connection pooling parameters
+for <code class="service">pnfsmanager</code> are now exposed through
+the new <code class="property">db.connections.*</code> family of
+configuration properties. Consult
+the <a href="https://github.com/dCache/dcache/blob/2.6/skel/share/defaults/pnfsmanager.properties">
+pnfsmanager.properties</a> file for further details.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/b3b51389fad122ead3a9488934c59899b58ed276">b3b5138</a>,
+<a href="https://github.com/dCache/dcache/commit/2becbe342146b85139445bf231710b1370946ce3">2becbe3</a>,
+<a href="https://github.com/dCache/dcache/commit/05231fb8ec3f517cf6e47982298f5d2f19215e57">05231fb</a>,
+<a href="https://github.com/dCache/dcache/commit/3b04b88a32803d17a639dc576bd0e91e7e2c3ae6">3b04b88</a>,
+<a href="https://github.com/dCache/dcache/commit/e02ea48a3565606476994408a6890c04bed2a4ce">e02ea48</a>,
+<a href="https://github.com/dCache/dcache/commit/3dc762878ae877abc6dd0efa36f89f7b2ae58779">3dc7628</a>,
+<a href="https://github.com/dCache/dcache/commit/8b1fb2d57a75e1c644d3d8fc407bc86acf5ea9a2">8b1fb2d</a>,
+<a href="https://github.com/dCache/dcache/commit/81a05047d37c12a71e785d7ec71af38f4185d56b">81a0504</a>,
+<a href="https://github.com/dCache/dcache/commit/d07e01c1aa9c53b1cbb011d78cc4ce7a1a3f5021">d07e01c</a>,
+<a href="https://github.com/dCache/dcache/commit/a6c8c97f0007a9012eaf6cbeac56066e208e818d">a6c8c97</a>,
+<a href="https://github.com/dCache/dcache/commit/7af43099ccdda56691dcc9825e65a3c4ee2faeb7">7af4309</a>.</p>
+
+<h3>Chimera command line tool</h3>
+
+<p>The <code>chimera-cli</code> has been improved with several new features.</p>
+
+<p>The new <code>rmtag</code> can be used to delete directory tags using.</p>
+
+<pre>
+$ <code>chimera-cli writetag / test foo</code>
+$ <code>chimera-cli lstag / </code>
+Total: 1
+test
+$ <code>chimera-cli readtag / test</code>
+foo
+$ <code>chimera-cli rmtag / test</code>
+</pre>
+
+<p>The <code>chown</code> command can now change the group of filesa and directories.</p>
+
+<pre>
+$ <code>chimera-cli ls /</code>
+total 2
+drwxr-xr-x 3 0 0 512 Oct 21  2011 pnfs
+drwxr-xr-x 2 0 0 512 May 10  2012 test
+$ <code>chimera-cli chown /test 1000:1000</code>
+$ <code>chimera-cli ls /</code>
+total 2
+drwxr-xr-x 3    0    0 512 Oct 21  2011 pnfs
+drwxr-xr-x 2 1000 1000 512 May 10  2012 test
+</pre>
+
+<p>The <code>checksum</code> has been extended with features to query, set and remove 
+specific checksums of a file.</p>
+
+<pre>
+$ <code>chimera-cli checksum /pnfs/dcache-vm/data/test-1344174183-2 list</code>
+ADLER32:5ce8e869
+$ <code>chimera-cli checksum /pnfs/dcache-vm/data/test-1344174183-2 get ADLER32</code>
+5ce8e869
+$ <code>chimera-cli checksum /pnfs/dcache-vm/data/test-1344174183-2 delete ADLER32</code>
+$ <code>chimera-cli checksum /pnfs/dcache-vm/data/test-1344174183-2 add ADLER32 5ce8e869</code>
+$ <code>chimera-cli checksum /pnfs/dcache-vm/data/test-1344174183-2 list</code>
+ADLER32:5ce8e869
+</pre>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/9962dcd2fffd187b95499d7f707f87fbd769b0a8">9962dcd</a>,
+<a href="https://github.com/dCache/dcache/commit/f4ef4449aa82d279486c257844faac605d7f0546">f4ef444</a>,
+<a href="https://github.com/dCache/dcache/commit/047126ff55d10b70b01bc98586599265a5087deb">047126f</a>.</p>
+
+<h2>Services</h2>
+
+<h3>pnfsmanager</h3>
+
+<p>Even though support for PNFS has been removed, the name space
+service of dCache is still called <code class="service">pnfsmanager</code>. The unique IDs
+of files stored in dCache is called a PNFS ID like it has always
+been.</p>
+
+<p>The previously deprecated the <code class="admin">set storageinfo</code> command has been
+removed. The implementation was incomplete.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/e769d4c9b387533d7e6b426b94ede9daf9aafe07">e769d4c</a>,
+<a href="https://github.com/dCache/dcache/commit/88b5041a601dded27cdaa1563b4971a753455892">88b5041</a>.</p>
+
+<h3>poolmanager</h3>
+
+<p>Added option to enable logging of pool selection and cost
+information to billing. The feature can be enabled by setting
+<code class="property">poolmanager.cache-hit-messages.enabled=true</code>.</p>
+
+<p>Fixed a bug in the interpretation of the <code>onerror</code> setting
+that could cause requests to suspend rather than to fail.</p>
+
+<p>The <code class="admin">rc ls</code> admin shell command has been extended with an
+option to list the clients that issued the request.</p>
+
+<p>The online help of the <code class="admin">psu create unit</code> command has been
+improved.</p>
+
+<pre>
+<small>[dcache-vm] (PoolManager) admin > <code class="admin">help psu create unit</code>
+NAME
+    psu create unit
+
+SYNOPSIS
+    psu create unit UNITTYPE NAME
+
+DESCRIPTION
+    Creates a new unit of the specified type.  A unit is a predicate
+    that is used to select which pools are eligable for a specific user
+    request (to read data from dCache or write data).  Units are
+    combined in unit-groups; see psu create unitgroup for more details.
+
+    The UNITTYPE is one of '-net', '-store', '-dcache' or '-protocol'
+    to create a network, store, dCache or protocol unit, respectively.
+
+    The NAME of the unit describes which particular subset of user
+    requests will be selected; for example, a network unit with the
+    name '10.1.0.0/24' will select only those requests from a computer
+    with an IP address matching that subnet.
+
+    The NAME for network units is either an IPv4 address, IPv6 address,
+    an IPv4 subnet or an IPv6 subnet.  Subnets may be written either
+    using CIDR notation or as an IP address and netmask, joined by a
+    '/'.
+
+    The NAME for store units has the form <StorageClass>@<HSM-type>.
+    Both <StorageClass> and <HSM-type> may be replaced with a '*' to
+    match any value.  If the HSM-type is 'osm' then <StorageClass> is
+    constructed by joining the store-name and store-group with a colon:
+    <StoreName>:<StoreGroup>@osm.
+
+    The NAME for a dcache unit is an arbitrary string.  This matches
+    against the optional cache-class that may be set within the
+    namespace in a similar fashion to the storage-class.
+
+    The NAME for a protocol unit has the form <protocol>/<version>. If
+    <version> is '*' then all versions of that protocol match.
+
+OPTIONS
+    none</small>
+</pre>
+
+<p>Lowers the default limit of allowed replicas of a file from 500 to
+3. This affects classic and wass partitions. The limit can be
+controlled by setting the max-copies parameter through the <code class="admin">pm</code>
+commands in PoolManager.</p
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/646bb5d03d9eb433db7636c62da037553c60e4db">646bb5d</a>,
+<a href="https://github.com/dCache/dcache/commit/81c8948ee47da78fbb135d4a62dc6e6956f2df44">81c8948</a>,
+<a href="https://github.com/dCache/dcache/commit/c949a470f97da2da023a1e31d545b607e3358b5d">c949a47</a>,
+<a href="https://github.com/dCache/dcache/commit/1d56502cb98a9c6c16b65f500349b531b7ec00ba">1d56502</a>,
+<a href="https://github.com/dCache/dcache/commit/1c75200dacc713769eca96f20593853a080ef992">1c75200</a>.</p>
+
+<h3>gplazma</h3>
+
+<p>The <code>gplazma1</code> plugin that previously provided support for
+legacy gPlazma configuration has been removed. On upgrade to dCache
+2.6 the equivalent gPlazma plugins have to be configured. Note that
+although the authorization files used by those plugins are
+syntactically identical to those used by the <code>gplazma1</code> plugin,
+there may be subtle semantic differences. Refer to
+the <a href="http://www.dcache.org/manuals/upgrade-1.9.12-to-2.2.shtml">2.2
+upgrade guide</a> for further details.</p>
+
+
+<p>A new <code>ldap</code> plugin for the map and identity phases has been added. Consult the
+<code class="property">gplazma.ldap.*</code> family of properties
+documented
+in <a href="https://github.com/dCache/dcache/blob/2.6/skel/share/defaults/gplazma.properties">gplazma.properties</a>
+for further details.</p>
+
+<p>The <code>kpwd</code> plugin now accepts 0 as a valid value for the UID
+and GID fields.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/34be5d7f6dfdcf1af173c00e8657583fd7ca4040">34be5d7</a>,
+<a href="https://github.com/dCache/dcache/commit/3358c5733255c07775cefc4af9bbeb3ca58dd8be">3358c57</a>,
+<a href="https://github.com/dCache/dcache/commit/4537675eb9cbc12dad93e15899502a80afcea698">4537675</a>,
+<a href="https://github.com/dCache/dcache/commit/bb14ddd15c8105720295348d84af00201582e9bb">bb14ddd</a>.</p>
+
+<h3>srm</h3>
+
+<p>The <code class="property">srmLsRequestLifetime</code> property has been
+removed. Support for this property was never implemented.</p>
+
+<p>The <code class="service">srm</code> now respects the <code class="property">gplazma</code>
+property, which allows the gPlazma instance used by <code class="service">srm</code>
+to be configured.</p>
+
+<p>Logging of unexpected problems has been improved.</p>
+
+<p>Fixed a bug that would cause srm startup to fail with an
+IllegalStateException if SRM requests have expired while dCache was
+shut down.</p>
+
+<p>Persistence of authorization information was ported from the
+Eclipse TopLink library to DataNucleus. Although this is mostly an
+internal change, the table names for this information have changed
+from authrecord, authgroup and authgrouplist to AUTHRECORD, AUTHGROUP
+and AUTHGROUPLIST. The old tables can be dropped after upgrade,
+although they will not be dropped automatically. These tables do not
+contain any data that needs to be preserved for longer periods of
+time.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/466f9a63a82d1cc1491745a39ac78591910c373b">466f9a6</a>,
+<a href="https://github.com/dCache/dcache/commit/38e4e041c4335d29f36f216db31967655fb7992f">38e4e04</a>,
+<a href="https://github.com/dCache/dcache/commit/4fc6e2b825e0602b530819750103ea611031b939">4fc6e2b</a>,
+<a href="https://github.com/dCache/dcache/commit/f4ed5c59b0f8fd525b99a77f7d3ee672e8267981">f4ed5c5</a>,
+<a href="https://github.com/dCache/dcache/commit/f113467817dbbd29bbe9d9b6f5896f677cd0e92e">f113467</a>.</p>
+
+<h3>spacemanager</h3>
+
+<p>Log output has been cleaned up.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/0e104569367d94dff3433910714ccc8415e18a71">0e10456</a>,
+<a href="https://github.com/dCache/dcache/commit/980e83425f98f262de4541ff2e083803a97b59e6">980e834</a>.</p>
+
+
+<h3>admin</h3>
+
+<p>We consider support for the SSH 1 protocol deprecated. Expect this
+to be removed in a future update.</p>
+
+<p>Host and server keys for SSH 2 are not generated automatically during
+installation of the RPM and DEB packages.</p>
+
+<p>For those cells that support the <code class="admin">bean ls</code> command,
+components internal to the Spring library are no longer listed. This
+also avoids the error messages that would otherwise be logged whenever
+the <code class="admin">bean ls</code> command is used.</p>
+
+<p>Remaining bits of the obsolete legacy logging system have been
+removed. In particular the deprecated <code class="admin">set printout</code> command
+has been removed.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/63e75f5cac6cf702fc651aab8bef522e4cd59e4a">63e75f5</a>,
+<a href="https://github.com/dCache/dcache/commit/c0a7264796f7fa0a50d707ac3180664eaf6a29f6">c0a7264</a>,
+<a href="https://github.com/dCache/dcache/commit/5120744ce9dd013b2669b65714c72629b48c274f">5120744</a>,
+<a href="https://github.com/dCache/dcache/commit/b1764a1cbac877b98755bb477e07e54205214878">b1764a1</a>.</p>
+
+<h3>pool</h3>
+
+<p>The library used for the Berkeley DB metadata backend has been
+updated. The new version uses a new on-disk format. Pools using the
+Berkeley DB backend will be upgraded to the new format during the
+first startup.</p>
+
+<div class="alert alert-block alert-info">It may be necessary to run a
+small script to prepare for the upgrade. If the pool fails to start
+with an EnvironmentFailureException failure after upgrading, then the
+script <code class="filename">
+/usr/sbin/dcache-pool-meta-preupgrade</code> needs to be
+executed.</div>
+
+<div class="alert alert-block">
+<p class="label label-warning">Warning</p>
+<p>Automatic downgrade is not possible. To downgrade, first convert
+the meta data to the file backend, downgrade and then convert back to
+the Berkeley DB backend. The <code>dcache pool convert</code> command
+can be used to convert the metadata.</p>
+</div>
+
+<p>Lock contention for meta data access using the Berkeley DB backend
+has been reduced.</p>
+
+<p>The migration module commands have been extened
+with <code>-force-source-mode</code> option to override the pool mode
+of the source pool. This allows files to be transferrred from a
+disabled pool.</p>
+
+<p>Pools cells are no longer required to be well-known cells, nor are
+pool cells required to have the same name as the pool they
+expose. Although mostly a curiousity at the moment, this feature may
+eventually allow the same pool to be exposed by multiple cells.</p>
+
+<p>Pool shutdown has been cleaned up considerably. Thread pools are
+now shut down prior to pool shutdown. Ongoing transfers are explicitly
+killed, allowing them to notify the
+door, <code class="service">billing</code>
+and <code class="service">pnfsmanager</code>.</p>
+
+<p>The <code class="admin">mover set max active</code> command now
+accepts 0 as a valid limit. This allows queues to be suspended.</p>
+
+<p>Several minor performance enhancements have been made in
+interacting with <code class="service">billing</code>
+and <code class="service">pnfsmanager</code>.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/84fb7b0a88bbe01bbc9f55088dd19b3902d90500">84fb7b0</a>,
+<a href="https://github.com/dCache/dcache/commit/ade5ee9ae5938baa4900b6f3f8c33a5e108d9392">ade5ee9</a>,
+<a href="https://github.com/dCache/dcache/commit/5245c98b2171179355cfbf24e067298a85570583">5245c98</a>,
+<a href="https://github.com/dCache/dcache/commit/bf10dfc4b3b2c7ad66aeb2f35323f1e04876757a">bf10dfc</a>,
+<a href="https://github.com/dCache/dcache/commit/62e854179390a1746662b426182e2d75b006120f">62e8541</a>,
+<a href="https://github.com/dCache/dcache/commit/797efe5008dd30696b413d45bde9d499e2130574">797efe5</a>,
+<a href="https://github.com/dCache/dcache/commit/bef8f45d8e809b5d171aac5823c56406cd987930">bef8f45</a>,
+<a href="https://github.com/dCache/dcache/commit/f370ba977a6a3774054cc8128ed9e261fc19bf34">f370ba9</a>,
+<a href="https://github.com/dCache/dcache/commit/e875c96fcc28d990a8f912bab0dac3e731f0ad7e">e875c96</a>,
+<a href="https://github.com/dCache/dcache/commit/806aa55855f3f34d3ff42fe8ae11d65bbdfc9b25">806aa55</a>,
+<a href="https://github.com/dCache/dcache/commit/3c255f3c4f8bf3bb6624fd4c9d15782d1af2336a">3c255f3</a>,
+<a href="https://github.com/dCache/dcache/commit/e3358e1bcbc68a92993a20cf7ca4b7dd8101de28">e3358e1</a>,
+<a href="https://github.com/dCache/dcache/commit/b05936374299a51aeab06abd4623ea064c2f54f4">b059363</a>.</p>
+
+<a href="https://github.com/dCache/dcache/commit/8290f2f878a818a1398bea7c415a5b1274ec47eb">8290f2f</a> pool: Let file backend cache StorageInfo</li>
+
+<h3>billing</h3>
+
+<p>Logging of a particular billing message to billing files can now be disabled by
+setting the billing format of that message to the empty string.</p>
+
+<p>The MoverInfoMessage now contains a p2p field which captures
+whether the transfer is a pool to pool transfer or a regular
+transfer. <code class="service">billing</code> can be configured to
+log this field to the billing files. See 
+<a href="https://github.com/dCache/dcache/blob/2.6/skel/share/defaults/billing.properties">billing.properties</a>
+for details. The initiator field has been updated to prefix the
+initiator with either <tt>pool:</tt> or <tt>door:</tt>, depending on
+whether the request is a pool to pool transfer or a regular
+transfer.</p>
+
+<p>The billing DB schema has been extended with additional
+indexes. These indexes are of particular use when combined with the
+Gratia tool from Open Science Grid. The schema is automatically
+updated on first start and for large billing databases it is expected
+that the schema update will take some time.</p>
+
+<div class="alert alert-block alert-info">
+<p>If these indexes were already created by hand prior to the upgrade,
+then these should either be deleted or renamed as follows. This has to
+be done prior to updating dCache.</p>
+
+<table class="table table-striped table-condensed">
+<thead>
+<tr><th>Column</th><th>Index name</th></tr>
+</thead>
+<tbody>
+<tr><td>billinginfo.client</td><td>billinginfo_client_idx</td></tr>
+<tr><td>billinginfo.initiator</td><td>billinginfo_initiator_idx</td></tr>
+<tr><td>billinginfo.pnfsid</td><td>billinginfo_pnfsid_idx</td></tr>
+<tr><td>billinginfo.storageclass</td><td>billinginfo_storageclass_idx</td></tr>
+<tr><td>billinginfo.transaction</td><td>billinginfo_transaction_idx</td></tr>
+<tr><td>doorinfo.owner</td><td>doorinfo_owner_idx</td></tr>
+<tr><td>doorinfo.pnfsid</td><td>doorinfo_pnfsid_idx</td></tr>
+<tr><td>doorinfo.transaction</td><td>doorinfo_transaction_idx</td></tr>
+<tr><td>storageinfo.pnfsid</td><td>storageinfo_pnfsid_idx</td></tr>
+<tr><td>storageinfo.transaction</td><td>storageinfo_transaction_idx</td></tr>
+<tr><td>storageinfo.storageclass</td><td>storageinfo_storageclass_idx</td></tr>
+<tr><td>hitinfo.pnfsid</td><td>hitinfo_pnfsid_idx</td></tr>
+<tr><td>hitinfo.transaction</td><td>hitinfo_transaction_idx</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Connection pooling parameters
+for <code class="service">billing</code> are now exposed through the
+new <code class="property">db.connections.*</code> family of
+configuration properties. Consult
+the <a href="https://github.com/dCache/dcache/blob/2.6/skel/share/defaults/billing.properties">billing.properties</a>
+file for further details.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/438d84fb591b6c8e526371056d8e37fc6821e258">438d84f</a>,
+<a href="https://github.com/dCache/dcache/commit/be864e8457a349af4fd4c0059a6dc3cc3785e2f4">be864e8</a>,
+<a href="https://github.com/dCache/dcache/commit/208c3a3d590fa738faa0ad904fd2f8d85b549d22">208c3a3</a>,
+<a href="https://github.com/dCache/dcache/commit/c6c422f9d885aab7641d62dc1b7f6934e55fc4d5">c6c422f</a>.</p>
+
+
+<h3>missingfiles</h3>
+
+<p>Currently, when a user requests to read a file that doesn't exist,
+the door will respond to the user with the appropriate error
+message.</p>
+
+<p>There are two use-cases where something more sophisticated is
+desirable.  The first is that dCache should notify one or more
+external services that it was requested to read a file that doesn't
+exist.  The second is that dCache will populate the missing file from
+some external source, allowing the read request to succeed.  There may
+be other examples where it is desirable for dCache to react to failed
+read attempts.</p>
+
+<p>The <code class="service">missingfiles</code> service is a new dCache component.
+It exists to allow dCache to react in a coordinated fashion to a
+user's request to read a file that doesn't exist.  This central
+service instructs the door to either fail the request or retry (which
+makes sense only if the file has been fetched from some external
+source).</p>
+
+<p>The <code class="service">missingfiles</code> service is pluggable.  It takes a
+list of plugins and instantiates them.  These plugins are used to
+determine how dCache should react when a user attempts to read a
+missing file.  Each plugin is asked in turn what to do until a plugin
+replies with a terminating answer or the list of plugins is exhausted.
+A plugin replies saying to fail the request, to retry the request or
+to ask the next plugin in the chain.  If the last plugin defers the
+request then then the <code class="service">missingfiles</code> service will instruct
+the door to fail the request.</p>
+
+<p>Currently only the WebDAV door has been updated to support the new
+service. With the default configuration, the WebDAV door does not send
+messages to the <code class="service">missingfiles</code> service; therefore, sites
+should be unaffected unless they enable support by setting
+<code class="property">missing-files.enabled=true</code>.</p>
+
+<p>Only the <code>semsg</code> demo plugin is shipped with dCache.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/c19decaa029f8a99cfcfe0abdefad099a5e9bdc8">c19deca</a>.</p>
+
+
+<h3>httpd</h3>
+
+<p>The <code class="service">webadmin</code> service has been
+integrated into the <code class="service">httpd</code>
+service. Webadmin is no longer available as a separate service. The
+default index page of <code class="service">httpd</code> has been
+replaced by webadmin. The old pages are available under
+the <code class="filename">/old</code> path.</p>
+
+<p>Authentication for <code class="service">httpd</code> must can be
+enabled by
+setting <code class="property">authenticated=true</code>. Pages in
+webadmin that require authentication will be inoperative if
+authentication is not enabled.</p>
+
+<p><code class="service">httpd</code> can now host any webapp. A webapp can be added using the
+<code class="admin">set alias <em>name</em>
+webapp <em>path-to-the-war-directory</em> <em>app-specific options
+...</em></code>  admin shell command. Add the command to a
+custom <code class="filename">httpd.conf</code> configuration to make
+the configuration persistent.</p>
+
+<p>Webadmin has been extended with plots produced from billing data
+stored in the billing DB. Support for these plots has to be explicitly
+enabled by setting <code class="property">generatePlots</code> to
+true. In previous version such plots could be produced by
+the <code class="service">billing</code>, which meant
+that <code class="service">billing</code>
+and <code class="service">httpd</code> had to share a common file
+system. This is no longer required.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/8157ab84ad5e09714b162c2898af630b4121b4a7">8157ab8</a>,
+<a href="https://github.com/dCache/dcache/commit/361382d7824f5aa18366bb53dd011c485d871bab">361382d</a>,
+<a href="https://github.com/dCache/dcache/commit/8a0e75c7ecca96834daad1a91ef2e296f82a98cc">8a0e75c</a>,
+<a href="https://github.com/dCache/dcache/commit/c14d931a3ee34d3c89f914ed4eae95bd6ad266c2">c14d931</a>,
+<a href="https://github.com/dCache/dcache/commit/327b4287218b6ba1596b6c0dfbeef4df809f7c4e">327b428</a>,
+<a href="https://github.com/dCache/dcache/commit/439c54b8e31443679c57fb168fd8ba7f0546b28b">439c54b</a>,
+<a href="https://github.com/dCache/dcache/commit/72142e2692f7ac3b794c03d5ecb6a4225b0a03d7">72142e2</a>,
+<a href="https://github.com/dCache/dcache/commit/42388b0039ad7ce739b506401fb2997520e949d5">42388b0</a>,
+<a href="https://github.com/dCache/dcache/commit/feb987c784ab1e25c7f6cdba33c89a8d7c88d25a">feb987c</a>.</p>
+
+<h3>alarms</h3>
+
+<p>The new <code class="service">alarms</code> service is a
+centrallized log classifier and log collector. dCache domains can be
+configured to send all log output above a certain threshold to a
+central instance of the <code class="service">alarms</code> service,
+which in turn classifies the messages into alarms. These alarms can be
+stored in a database and visualized through webadmin.</p>
+
+<p>The intention is that this system is used for events that are known
+to require administrative action, such as checksum errors on pools,
+pools that become disabled due to I/O errors, files that fail to stage
+from tape, etc. Over time the dCache developers will classify certain
+events as alarms, but the <code class="service">alarms</code> service
+allows the admin to classify additional log messages as alarms.</p>
+
+<p>One percularity of the <code class="service">alarms</code> service
+is that it <strong>must</strong> run in a domain on its own. This is
+because it uses a customized logback configuration that would
+interfere with any other service running in the same domain.</p>
+
+<p>Consult
+the <a href="https://github.com/dCache/dcache/blob/2.6/skel/share/defaults/alarms.properties">alarms.properties</a>
+file for available configuration properties.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/1ab7e19cf11d003aad771904d383b591e2233d85">1ab7e19</a>,
+<a href="https://github.com/dCache/dcache/commit/ff90d0b3448ef3fadb9474d49cb90e332b8ce47e">ff90d0b</a>,
+<a href="https://github.com/dCache/dcache/commit/285f4b8a9c5d3416c3fb26809ed855586ff5b42b">285f4b8</a>.</p>
+
+
+<h2>Miscellaneous</h2>
+
+<h3>Java 7</h3>
+
+<p>Java 7 is now a required dependency for dCache. As always, we
+recommend installing the JDK over the JRE, because the JDK contains
+additional debugging tools.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/5c18a8915fa03a2817695b0a248529165b494541">5c18a89</a>.</p>
+
+<h3>Third party libraries</h3>
+
+<p>A large number of third party libraries have been upgraded. We list
+the biggest upgrades here as they may impact customized
+installations.</p>
+
+<dl>
+<dt>DataNucleus 3.1</dt>
+<dd>DataNucleus is a database persistence library used by <code class="service">srm</code> and
+<code class="service">pinmanager</code>.</dd>
+<dt>Jetty 7.5</dt>
+<dd>Jetty is an embedded HTTP server used
+by <code class="service">webdav</code>, <code class="service">srm</code>, and <code class="service">httpd</code>
+service.</dd>
+<dt>Berkeley DB Java Edition 5.0.58</dt>
+<dd>Berkeley DB is an embedded non-relational database used
+by <code class="service">pool</code> for meta data. The upgrade changes the on-disk
+format and pools cannot be automatically downgraded.</dd>
+<dt>JGlobus 2.0</dt>
+<dd>JGlobus is an implementation of GSI and GridFTP used by <code class="service">srm</code>,
+<code class="service">webdav</code>, <code class="service">gsidcap</code>,
+and <code class="service">gridftp</code>. The main improvements in JGlobus 2 are
+support for the SHA-2 cryptographic hash function, and that it no
+longer relies on the obsolete PureTLS library.</dd>
+<dt>Milton 2.3</dt>
+<dd>Milton is an implementation of the WebDAV protocol used
+by <code class="service">webdav</code>.</dd>
+<dt>ActiveMQ 5.7</dt>
+<dd>ActiveMQ is a messaging broker that can be used as an alternative
+to native cells messaging.</dd>
+<dt>OpenMQ 4.5</dt>
+<dd>OpenMQ is a message broker that can be used as an alternative to
+native cells messaging.</dd>
+<dt>Netty 3.6</dt>
+<dd>Netty is an I/O framework used by <code class="service">xrootd</code> and the
+xrootd and HTTP movers in <code class="service">pool</code>.</dd>
+</dl>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/8834e4e5168496f5573758572079d706eb5aa671">8834e4e</a>,
+<a href="https://github.com/dCache/dcache/commit/290f97e17e7e839687f0cb794feceea5fde24afe">290f97e</a>,
+<a href="https://github.com/dCache/dcache/commit/30557fd5739fe157d7985d80cf88bb000b0da7d3">30557fd</a>,
+<a href="https://github.com/dCache/dcache/commit/31c6ee7fc51ee5f79f9f5ce5ebf8939495777a63">31c6ee7</a>,
+<a href="https://github.com/dCache/dcache/commit/3a29584c3e0d0fe588bccc08af6a694ed1bba19b">3a29584</a>,
+<a href="https://github.com/dCache/dcache/commit/4ae97a4eacf004d6c29d9687ae8f6563c465b785">4ae97a4</a>,
+<a href="https://github.com/dCache/dcache/commit/11e9a8d7062a553d9cf6d7cd4bd678aaee9dba69">11e9a8d</a>,
+<a href="https://github.com/dCache/dcache/commit/8cc5e7aa5934ee4424abe6c00b7fa39aaffdd666">8cc5e7a</a>,
+<a href="https://github.com/dCache/dcache/commit/21fd8dda3645514305fc30a0555a231bfb8e60b0">21fd8dd</a>,
+<a href="https://github.com/dCache/dcache/commit/e2cbf55c3916473e957af2200d7eb4e6c57dd912">e2cbf55</a>,
+<a href="https://github.com/dCache/dcache/commit/49394aced067ce2784d47e2befb59662d0e7448d">49394ac</a>,
+<a href="https://github.com/dCache/dcache/commit/6febf98e526c206f9a8e40e69a96e1dc8722811e">6febf98</a>,
+<a href="https://github.com/dCache/dcache/commit/605f7f76959be39d6607c51df4fe53e157994092">605f7f7</a>,
+<a href="https://github.com/dCache/dcache/commit/8ce45fe70ee2ad1f3652ed338f477c94c7e8f019">8ce45fe</a>.</p>
+
+<h3>dcache command line utility</h3>
+
+<p>The <code>dcache status</code> command was extended to show the uptime
+of dCache:</p>
+
+<pre>
+$ <code>dcache status</code>
+DOMAIN          STATUS                   PID  USER     
+dCacheDomain    running (for 23 seconds) 4520 dcache   
+adminDomain     running (for 23 seconds) 4581 dcache   
+namespaceDomain running (for 23 seconds) 4620 root     
+pool            running (for 2 seconds)  5518 behrmann 
+gridftp-Domain  running (for 23 seconds) 4738 dcache
+</pre>
+
+<p>The <code>dcache database ls</code> command was extended to show
+information about connection limits:</p>
+
+<pre>
+<small>$ <code>dcache database ls</code>
+DOMAIN          CELL                  DATABASE HOST      USER      MIN  MAX MANAGEABLE AUTO 
+dCacheDomain    SrmSpaceManager       dcache   localhost srmdcache          No         Yes  
+dCacheDomain    cleaner               chimera  localhost chimera            No         No   
+dCacheDomain    PinManager            dcache   localhost srmdcache          Yes        Yes  
+dCacheDomain    billing               billing  localhost srmdcache 3    30  Yes        Yes  
+dCacheDomain    RemoteTransferManager dcache   localhost srmdcache          No         Yes  
+dCacheDomain    SRM-dcache-vm         dcache   localhost srmdcache          No         Yes  
+namespaceDomain PnfsManager           chimera  localhost chimera   30   90  Yes        Yes  
+namespaceDomain NFSv3-dcache-vm       chimera  localhost chimera            No         No   
+TOTAL                                                              33   120    
+</small></pre>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/8dd8d942d97a260f7ff0bd4e80bd0677890e388a">8dd8d94</a>,
+<a href="https://github.com/dCache/dcache/commit/3c37b0f0d5d65dbad2c8fef5622f8b5918b6360b">3c37b0f</a>.</p>
+
+<h3>Version numbers</h3>
+
+<p>Since dCache has moved to Git as its primary source code management
+system, SVN revision numbers are no longer used when reporting dCache
+component versions. Instead a build identifier consisting of a
+timestamp and the user who build dCache is used. This information is
+visisble in the <code class="service">webadmin</code> interface and through
+the <code class="service">info</code> service.</p>
+
+<pre class="prettyprint">
+<span class="nocode">$ curl http://localhost:2288/info/domains/dCacheDomain/cells/PoolManager/version</span>
+&lt;?xml version="1.0"?&gt;
+&lt;dCache xmlns="http://www.dcache.org/2008/01/Info"&gt;
+  &lt;domains&gt;
+    &lt;domain name="dCacheDomain"&gt;
+      &lt;cells&gt;
+        &lt;cell name="PoolManager"&gt;
+          &lt;version&gt;
+            &lt;metric name="revision" type="string"&gt;2013-05-01_09-47_behrmann&lt;/metric&gt;
+            &lt;metric name="release" type="string"&gt;2.6.0-SNAPSHOT&lt;/metric&gt;
+          &lt;/version&gt;
+        &lt;/cell&gt;
+      &lt;/cells&gt;
+    &lt;/domain&gt;
+  &lt;/domains&gt;
+&lt;/dCache&gt;
+</pre>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/4ab93514f346404a1fb5bf1dd024cc978284a381">4ab9351</a>.</p>
+
+<h3>Storage accounting</h3>
+
+<p>dCache supports publishing accounting information in
+the <a href="https://wiki.egi.eu/wiki/APEL/SSM">SSM2</a> format using
+the <code class="filename">skel/bin/dcache-star</code> script.</p>
+
+<p>Commits: 
+<a href="https://github.com/dCache/dcache/commit/60f8aa75b5d9f136ea628ea165b573dd68419036">60f8aa7</a>,
+<a href="https://github.com/dCache/dcache/commit/8c4cd3c0fb0521406adb6ac000b1ba188bb047e5">8c4cd3c</a>.</p>
+
+<h3>JMX</h3>
+
+<p><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/management/agent.html">JMX</a>
+is a facility for monitoring Java virtual machines. JMX information
+can be accessed
+with <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/management/jconsole.html">jconsole</a>
+and other tools. Several changes to expose more information through
+JMX have been made, including request counters in pnfsmanager and
+srm.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/d288241140dc1896ae2f361d7309f76a579c2a27">d288241</a>,
+<a href="https://github.com/dCache/dcache/commit/20b5997aeae36e3f9559daa9467c9975605f89f5">20b5997</a>,
+<a href="https://github.com/dCache/dcache/commit/a70ead6906ea810e4c60978cfb5763e39e248a88">a70ead6</a>.</p>
+
+<h3>Configuration</h3>
+
+<p>Most invocations of the <code>dcache</code> and other command line
+utilities require that the configuration files are parsed. This
+involves a slow JVM startup, which is responsible for the somewhat
+sluggish performance observed from this utility in earlier versions. A
+configuration cache has now been added that will cache the parsed
+configuration and reuse it when none of the input files have been
+changed. The cached information is stored
+in <code class="filename">/var/lib/dcache/config/cache</code>. If
+sensistive information is stored in any configuration file, access to
+the cache directory should be protected.</p>
+
+<p>Trailing white space is now stripped from the layout file.</p>
+
+<p>The example layout file <code class="filename">single.conf</code>
+has been altered to no longer disable the interdomain message
+broker. This is intended to make it easier for new users to configure
+a multidomain dCache. However be aware that access to port 11111 has
+to be firewalled for a secure setup.</p>
+
+<p>Commits:
+<a href="https://github.com/dCache/dcache/commit/538bc1a09c947cb3a5a4dff846e4e5fdda1ed3a0">538bc1a</a>,
+<a href="https://github.com/dCache/dcache/commit/2efced333a31bc13a493d141afc626a803b4ec35">2efced3</a>,
+<a href="https://github.com/dCache/dcache/commit/bff3740a0e29acac01146d2e37e302b7b3f2554b">bff3740</a>.</p>
+
+<h2>Reference material</h2>
+
+<h3>Upgrade checklist</h3>
+
+
+<h3>Known issues when upgrading</h3>
+
+<dl>
+  <dt>too many threads/processes</dt>
+  <dd>
+    <p>
+      When upgrading to RHEL 6 the number of processes (and therefore,
+      the number of threads) is limited to 1024 for non-root users.
+      For a dCache domain (in particular SRM, dcap and FTP doors, and
+      FTP and dcap transfers on pools) 1024 threads is too few for a
+      busy site.  As dCache does not run as root but as the user
+      'dcache' this limit needs to be extended.
+    </p>
+    <p>
+      One symptom of this problem is the message:
+      <blockquote>
+	<tt>java.lang.OutOfMemoryError: unable to create new native thread</tt>
+      </blockquote>
+      Another symptom is, on pool nodes, the message:
+      <blockquote>
+	<tt>ClosedByInterruptException [..] DiskErrorCacheException: Disk I/O Error</tt>
+      </blockquote>
+    </p>
+    <p>
+      The problem may be solved by granting 'dcache' user a specific
+      profile; for example, by creating the file
+      <code class="filename">/etc/security/limits.d/dCache</code> with
+      the following contents:
+      <pre class="prettyprint">
+
+	dcache  soft  nofile  unlimited
+      </pre>
+    </p>
+  </dd>
+  <dt>too many database connections</dt>
+  <dd>
+    <p>
+      dCache requires rather a large number of database connections,
+      but it doesn't make active use of these connections.  Therefore,
+      future versions of dCache will likely reduce the number of
+      database connections.
+    </p>
+    <p>
+      When upgrading dCache from v2.2 to v2.6, the policy of when
+      database connections are established has changed.  Some
+      components in v2.2 established connections only when needed; in
+      dCache v2.6 these components establish database connections on
+      startup.
+    </p>
+    <p>
+      Since dCache prior to v2.6 will typically not make use of all
+      database connections, a dCache instance may be configured to use
+      a far greater number of database connections that the PostgreSQL
+      instance allows without any problem.  When such a site upgrades
+      to v2.6, their dCache instance will fail since dCache will
+      attempt to establish all connections on start up.
+    </p>
+    <p>
+      The symptom is that a dCache core component that uses a database
+      (chimera, pin-manager, SRM, space-manager, transfer-manager, billing)
+      fails to start and the PostgreSQL log files describe how there are too
+      many connections.
+    </p>
+    <p>
+      The problem may be solved by simply increasing the number of
+      concurrent connections that PostgreSQL allows.
+    </p>
+  </dd>
+</dl>
+
+
+
+
+
+
+
+<h3>Terminology</h3>
+
+<dl class="dl-horizontal">
+<dt>cell</dt>
+<dd>A component of dCache. dCache consists of many cells. A cell must
+have a name which is unique within the domain hosting the cell.</dd>
+<dt>domain</dt>
+<dd>A container hosting one or more dCache cells. A domain runs within
+its own process. A domain must have a name which is unique throughout
+the dCache instance.</dd>
+<dt>service</dt>
+<dd>An abstraction used in dCache configuration files to describe
+atomic units to add to a domain. A service is typically implemented
+through one or more cells.</dd>
+<dt>layout</dt>
+<dd>Definition of domains and services on a given host. The layout is
+specified in the layout file. The layout file may contain both domain-
+and service- specific configuration values.</dd>
+<dt>pool</dt>
+<dd>A service providing physical data storage.</dd>
+</dl>
+
+<h3>Services</h3>
+
+<p>This section lists all supported services.  Those marked with a
+* are services that dCache requires to function
+correctly. Dotted dependencies are optional.</p>
+
+<table class="table">
+<caption>Core services</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Decscription</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>broadcast<sup>&lowast;</sup></td>
+<td>Internal message broadcast service.</td>
+</tr>
+<tr>
+<td>cleaner<sup>&lowast;</sup></td>
+<td>Service to remove files from pools and tapes when the name space
+entry is deleted.</td>
+</tr>
+<tr>
+<td>cns</td>
+<td>Cell naming service used in conjuction with JMS for well known
+name lookup.</td>
+</tr>
+<tr>
+<td>dir</td>
+<td>Directory listing support for DCAP.</td>
+</tr>
+<tr>
+<td>gplazma</td>
+<td>Authorization cell</td>
+</tr>
+<tr>
+<td>hopping</td>
+<td>Internal file transfer orchestration.</td>
+</tr>
+<tr>
+<td>loginbroker</td>
+<td>Central registry of all doors. Provides data to SRM for load
+balancing.</td>
+</tr>
+<tr>
+<td>pinmanager</td>
+<td>Pinning and staging support for SRM and DCAP.</td>
+</tr>
+<tr>
+<td>pnfsmanager<sup>&lowast;</sup></td>
+<td>Gateway to name space (either PNFS or Chimera).</td>
+</tr>
+<tr>
+<td>pool<sup>&lowast;</sup></td>
+<td>Provides physical data storage.</td>
+</tr>
+<tr>
+<td>poolmanager<sup>&lowast;</sup></td>
+<td>Central registry of all pools. Routes transfers to pools, triggers
+staging from tape, performs hot spot detection.</td>
+</tr>
+<tr>
+<td>replica</td>
+<td>Manages file replication for <em>Resilient dCache</em>.</td>
+</tr>
+<tr>
+<td>spacemanager</td>
+<td>Space reservation support for SRM.</td>
+</tr>
+<tr>
+<td>srm-loginbroker</td>
+<td>Central registry of all SRM doors.</td>
+</tr>
+</tbody>
+</table>
+
+<table class="table">
+<caption>Admin and monitoring services</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Decscription</th>
+<th>Dependencies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin</td>
+<td>SSH based admin shell.</td>
+<td></td>
+</tr>
+<tr>
+<td>alarms</td>
+<td>Centrallized log collector for alarms.</td>
+<td></td>
+</tr>
+<tr>
+<td>billing<sup>&lowast;</sup></td>
+<td>Service for logging to billing files or the billing database.</td>
+<td></td>
+</tr>
+<tr>
+<td>httpd</td>
+<td>Monitoring portal. Includes webadmin.</td>
+<td><code class="service">loginbroker</code> <code class="service">topo</code></td>
+</tr>
+<tr>
+<td>info</td>
+<td>Info service that collects information about the dCache
+instance.</td>
+<td><code class="service optional">httpd</code></td>
+</tr>
+<tr>
+<td>statistics</td>
+<td>Collects usage statistics from all pools and generates reports in
+HTML.</td>
+<td></td>
+</tr>
+<tr>
+<td>topo</td>
+<td>Builds a topology map of all domains and cells in the dCache
+instance.</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<table class="table">
+<caption>Doors</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Decscription</th>
+<th>Dependencies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>authdcap</td>
+<td>Authenticated DCAP door.</td>
+<td><code class="service">dir</code> <code class="service optional">pinmanager</code></td>
+</tr>
+<tr>
+<td>dcap</td>
+<td>dCap door.</td>
+<td><code class="service">dir</code> <code class="service optional">pinmanager</code></td>
+</tr>
+<tr>
+<td>gsidcap</td>
+<td>GSI dCap door.</td>
+<td><code class="service">dir</code> <code class="service optional">pinmanager</code></td>
+</tr>
+<tr>
+<td>kerberosdcap</td>
+<td>Kerberized dCap door.</td>
+<td><code class="service">dir</code> <code class="service optional">pinmanager</code></td>
+</tr>
+<tr>
+<td>ftp</td>
+<td>Regular FTP door without strong authentication.</td>
+<td></td>
+</tr>
+<tr>
+<td>gridftp</td>
+<td>GridFTP door.</td>
+<td></td>
+</tr>
+<tr>
+<td>kerberosftp</td>
+<td>Kerberized FTP door.</td>
+<td></td>
+</tr>
+<tr>
+<td>nfsv3</td>
+<td>NFS 3 name space export (only works with Chimera).</td>
+<td></td>
+</tr>
+<tr>
+<td>nfsv41</td>
+<td>NFS 4.1 door (only works with Chimera).</td>
+<td></td>
+</tr>
+<tr>
+<td>srm</td>
+<td>SRM door.</td>
+<td><code class="service">pinmanager</code>
+<code class="service">loginbroker</code> <code class="service">srm-loginbroker</code>
+<code class="service optional">transfermanagers</code> <code class="service optional">spacemanager</code></td>
+</tr>
+<tr>
+<td>transfermanagers</td>
+<td>Server side srmCopy support for SRM.</td>
+<td></td>
+</tr>
+<tr>
+<td>webdav</td>
+<td>HTTP and WebDAV door.</td>
+<td></td>
+</tr>
+<tr>
+<td>xrootd</td>
+<td>XROOT door.</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<table class="table">
+<caption>Obsolete services</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>acl</td>
+<td>Integrated into <code class="service">pnfsmanager</code>.</td>
+</tr>
+<tr>
+<td>dummy-prestager</td>
+<td><code class="service">dcap</code> now uses <code class="service">pinmanager</code> for staging.</td>
+</tr>
+<tr>
+<td>webadmin</td>
+<td>Integrated into <code class="service">httpd</code>.</td>
+</tr>
+</tbody>
+</table>
+
+<h3>gPlazma plugins</h3>
+
+<p>The following <code class="service">gplazma</code> plugins ship
+with dCache and can be used in <tt>gplazma.conf</tt>. Note that
+several plugins implement more than one type. Usually such plugins
+should be added to all phases supported by the plugin.</p>
+
+<table class="table">
+<caption>gPlazma plugins</caption>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jaas</td>
+<td>auth</td>
+<td>Implements password authentication through the Java Authentcation
+and Authorization Services (JAAS). A valid JAAS setup for password
+verification has to be defined in etc/jgss.conf. Fails if no password
+credential is provided or if JAAS denies the login. A username
+principal is generated upon success.</td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>auth</td>
+<td>Implements password authentication using the kpwd file. Fails if
+no password credential is provided, if the username is not defined in
+the kpwd file, if the password is invalid, or if the entry has been
+disabled in the kpwd file.</td>
+</tr>
+<tr>
+<td>voms</td>
+<td>auth</td>
+<td>Validates any VOMS attributes in an X.509 certificate and extracts
+all valid FQANs. Requires that a vomsdir is configured. Fails if no
+valid FQAN is found.</td>
+</tr>
+<tr>
+<td>x509</td>
+<td>auth</td>
+<td>Extracts the DN from an X.509 certificate. The certificate chain
+is not validated (it is assumed that the door already validated the
+chain). The plugin fails if no certificate chain is provided.</td>
+</tr>
+<tr>
+<td>xacml</td>
+<td>auth</td>
+<td></td>
+</tr>
+<tr>
+<td>authzdb</td>
+<td>map</td>
+<td>Maps user and group name principals to UID and GID principals
+according to a storage authzdb file. The file format does not
+distinguish between user names and group names and hence each entry in
+the file maps to both a UID and one or more GIDs.  Therefore the UID
+and the primary GID are determined by the mapping for the primary
+group name or user name. The name of that mapping is kept as the user
+name of the login and may be used for a session plugin or for
+authorization in space manager. Remaining GIDs are collected from
+other mappings of available group names.</td>
+</tr>
+<tr>
+<td>gridmap</td>
+<td>map</td>
+<td>Maps DN principals to user name principals according to a
+grid-mapfile. Fails if no DN was provided or no mapping is found.</td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>map</td>
+<td>Maps user names, DNs and Kerberos principals according to the kpwd
+file. Only user names verified by the kpwd auth plugin are
+mapped. Fails if nothing was mapped or if the kpwd entry has been
+disabled. Maps to user name, UID and GID principals.
+</td>
+</tr>
+<tr>
+<td>krb5</td>
+<td>map</td>
+<td>Maps Kerberos principals to username principals by stripping the
+domain suffix.</td>
+</tr>
+<tr>
+<td>nis</td>
+<td>map</td>
+<td>Maps user name principals to UID and GID through lookup in
+NIS.</td>
+</tr>
+<tr>
+<td>nsswitch</td>
+<td>map</td>
+<td>Maps user name to UID and GID according to the system native Name
+Service Switch.</td>
+</tr>
+<tr>
+<td>vorolemap</td>
+<td>map</td>
+<td>Maps FQAN principals to group name principals according to a
+grid-vorolemap file. Each FQAN is mapped to the first entry that is a
+prefix of the FQAN. The primary FQAN (the first in the certificate) is
+mapped to the primary group name. Fails if no FQAN was provided or no
+mapping was found.</td>
+</tr>
+<tr>
+<td>ldap</td>
+<td>map</td>
+<td></td>
+</tr>
+<tr>
+<td>mutator</td>
+<td>map</td>
+<td></td>
+<tr>
+<td>argus</td>
+<td>account</td>
+<td></td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>account</td>
+<td>Fails if the kpwd entry used during the map has been
+disabled.</td>
+</tr>
+<tr>
+<td>authzdb</td>
+<td>session</td>
+<td>Associates a user name with root and home directory and read-only
+status according to a storage authzdb file.</td>
+</tr>
+<tr>
+<td>kpwd</td>
+<td>session</td>
+<td>Adds home and root directories and read-only status to the
+session. Only applies to mappings generated by the kpwd map
+plugin.</td>
+</tr>
+<tr>
+<td>nis</td>
+<td>session</td>
+<td>Associates a user name with a home directory through NIS
+lookup. The sessions root directory is always set to root and the
+session is newer read-only.</td>
+</tr>
+<tr>
+<td>nsswitch</td>
+<td>session</td>
+<td>Sets the session home directory and root directory to the file
+system root, and sets the session's read-only status to false.</td>
+</tr>
+<td>ldap</td>
+<td>session</td>
+<td></td>
+</tr>
+<tr>
+<td>nis</td>
+<td>identity</td>
+<td>Maps user name principals to UID and group name principals to
+GID.</td>
+</tr>
+<tr>
+<td>nsswitch</td>
+<td>identity</td>
+<td>Maps user name principals to UID and group name principals to
+GID.</td>
+</tr>
+<td>ldap</td>
+<td>identity</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<p>Please
+consult <a href="https://github.com/dCache/dcache/blob/2.6/skel/share/defaults/gplazma.properties">gplazma.properties</a>
+for details about available configuration properties.</p>
+
+<h3>Changed properties</h3>
+
+</div>
+
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script src="jquery.tocify.min.js"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+
+<script>
+$(function() {
+  $("#toc").tocify({ selectors: "h2, h3, h4" }).data("toc-tocify");
+});
+</script>
+
+  </body>
+</html>
+

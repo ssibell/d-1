@@ -1,0 +1,144 @@
+---
+layout: default
+---
+
+
+
+<!-- beginn content -->
+<div id="content">
+
+<div class="book-navi">
+   <a href="/manuals/releasenotes.shtml">release notes</a>
+   | Book: 
+   <a href="/manuals/Book-2.10/index-fhs.shtml">2.10</a>, <a href="/manuals/Book-2.11/index-fhs.shtml">2.11</a>, <a href="/manuals/Book-2.12/index-fhs.shtml">2.12</a>, <a href="/manuals/Book-2.13/index-fhs.shtml">2.13</a>, <a href="/manuals/Book-2.14/index-fhs.shtml">2.14</a>, <a href="/manuals/Book-2.15/index-fhs.shtml">2.15</a>, <a href="/manuals/Book-2.16/index-fhs.shtml">2.16</a>, <a href="/manuals/Book-3.0/index-fhs.shtml">3.0</a>, <a href="/manuals/Book-3.1/index-fhs.shtml">3.1</a>
+   | <a href="http://trac.dcache.org/trac.cgi/wiki">Wiki</a>
+   | <a href="/manuals/FAQ.shtml">Q&amp;A</a>
+   <img src="/images/black_bg.png" width="100%" height="1" alt="black_bg" border="0" />
+</div>
+
+<br><br><br>
+<h2>User Commands</H2>
+
+<H1>NAME</H1>
+<ul>dccp - copy files from/to DiskCache</ul>
+
+<H1>SYNOPSIS</H1>
+<ul>
+<b><u>dccp</u></b> [ -d &lt;debuglevel&gt; ] [ -h &lt;replyHostName&gt; ] [ -i ]
+[ -S ] [ [ -P ] [ -t &lt;time&gt; ] [ -l &lt;location&gt; ] ]
+[ -a ] [-b &lt;read-ahead bufferSize&gt;] [ -B &lt;bufferSize&gt; ] [ -u ]
+[ -p &lt;first_port&gt;[:last_port] ] [ -T &lt;IO tunnel plugin&gt; ]
+[ -r &lt;TCP recive buffer size&gt;] [ -s &lt;TCP send buffer size&gt;]
+source [ destination ]
+</ul>
+
+<H1>DESCRIPTION</H1>
+<blockquote>
+     The dccp utility  provides a <i>cp(1)</i> like functionality on the pnfs file system.
+     The <i>source</i> must be a single file while the <i>destination</i> could be a directory name 
+     as well as a file name. If the directory is a destination, a new file with the same name 
+     as the source name will be created there and the contents of the <i>source</i> will be copied.
+<p>	 
+     If the final destination file exists in <i>pnfs</i>, it won't be overwritten and 
+     an error code will be returned. Files in regular file systems will always
+     be ovrerwriten if the <i>-i</i> option is not specified.
+<p>
+     If the <i>source</i> and the final <i>destination</i> file are located on a regular
+     file system (non pnfs), the dccp utility can be used similar to the cp(1) program.
+</blockquote>	 
+<H1>OPTIONS</H1>
+<ul>The following options are supported:</ul>
+<pre>
+     -d N   
+            Set the debug level. The possible debug levels are:
+	 
+            0: no output at all;
+            1: error messages only;
+            2: usefull information;
+            4: speed information;
+            8: trace ( for developers only );
+           16: function calls sequence ( for developers only );
+           32: IO ( for developers only ).
+		   
+           Multiple <i>-d</i> options allowed.
+		   
+     -h <i>hostname</i> 
+            Bind the callback connection to the specific interface.
+     -i 
+            Secure mode. Do not overwrite the existing files.
+     -a 
+            Enable the read-ahead.
+     -b <i>read-ahead bufferSize</i>
+            Specify read-ahead buffer size.
+     -B <i>bufferSize</i>
+            Specify transfer buffer size.
+     -P 
+            Pre-stage. Do not copy the file now.
+     -t <i>time</i> 
+            Specify time interval in seconds after which 
+            file should be staged. Used with <i>-P</i> option only.
+     -l <i>location</i>
+            Specify the location for pre-stage. If
+            the location is not specifed, then local host name will be used.
+            Used with <i>-P</i> option only.
+     -u
+            Enable unsafe write e.g. have only one acknoledgment at close
+            for complete write operation. (Recommended for reproducible sources).	
+     -p <i>first_port[:last_port]</i>
+            Bind the callback data connection to the specified TCP port/range.
+     -T <i>tunnel plugin</i>
+            Uses specified library for autehntification and tunneling of control line.
+     -r <i>TCP recive buffer size
+            Specify the TCP resive buffer size. Default 256K.
+     -s <i>TCP send buffer size
+            Specify the TCP send buffer size. Default 256K.
+</pre>
+<H1>OPERANDS</H1>
+<ul>The following operands are supported:</ul>
+<pre>
+	source
+           A pathname of a regular file to be copied.   
+	destination
+           A pathname of a directory or regular file where to copy the file.   
+    The stdin/stdout can be used as source/destination.
+
+</pre>
+
+<H1>EXAMPLES</H1>
+<ul>Example 1: To copy a file:</ul>
+<ul>example% dccp user_output_file /acs/&lt;user_space&gt;/new_output_file</ul>
+<br>
+<ul>Example 2: To copy a file to a  destination  directory:</ul>
+<ul>example% dccp user_output_file /acs/&lt;user_space&gt;/</ul>
+<br>
+<ul>Example 3: Pre-Stage request:</ul>
+<ul>example% dccp -P -t 3600 -l batch_node.desy.de /acs/&lt;user_space&gt;/data_file</ul>
+<br>
+<ul>Example 4: stdin/stdout:</ul>
+<ul>example% tar cf - &lt;data_dir&gt; | dccp - /acs/&lt;user_space&gt;/data_arch.tar</ul>
+<ul>example% dccp /acs/&lt;user_space&gt;/data_arch.tar - | tar xf - </ul>
+
+
+<H1>EXIT STATUS</H1>
+<pre>
+     The following exit values are returned:
+
+          0     All files were copied successfully.
+          >0    An error occurred.
+
+</pre>
+<H1>NOTES</H1>
+<blockquote>
+The regular expansion might be used with  dccp  only in case
+it results in a single operand.
+</blockquote>
+<br>
+	 <!-- //ende content// -->
+         </div>
+         <!-- //ende content// -->
+	     
+    <!-- //ende containter// -->
+      </div>
+      <!-- //ende containter// -->
+
+
